@@ -1,0 +1,4 @@
+cas_1_4.o: \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libgcc/config/aarch64/lse.S \
+ auto-target.h
+auto-target.h:

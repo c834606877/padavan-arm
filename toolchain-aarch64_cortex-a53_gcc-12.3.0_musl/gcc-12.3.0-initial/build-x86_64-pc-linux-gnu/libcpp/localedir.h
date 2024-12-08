@@ -1,0 +1,1 @@
+#define LOCALEDIR "/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/share/locale"

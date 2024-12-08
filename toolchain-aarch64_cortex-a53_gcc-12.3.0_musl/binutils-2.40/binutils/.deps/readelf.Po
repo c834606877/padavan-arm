@@ -1,0 +1,643 @@
+readelf.o: readelf.c /usr/include/stdc-predef.h sysdep.h config.h \
+ /usr/include/stdio.h \
+ /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+ /usr/include/features.h /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/bits/long-double.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/timesize.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/time64.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
+ /usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio2.h \
+ /usr/include/x86_64-linux-gnu/sys/types.h \
+ /usr/include/x86_64-linux-gnu/bits/types/clock_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/clockid_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/time_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/timer_t.h \
+ /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/endian.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/byteswap.h \
+ /usr/include/byteswap.h /usr/include/x86_64-linux-gnu/bits/byteswap.h \
+ /usr/include/endian.h /usr/include/x86_64-linux-gnu/bits/endian.h \
+ /usr/include/x86_64-linux-gnu/bits/endianness.h \
+ /usr/include/x86_64-linux-gnu/bits/uintn-identity.h \
+ /usr/include/x86_64-linux-gnu/sys/select.h \
+ /usr/include/x86_64-linux-gnu/bits/select.h \
+ /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
+ /usr/include/x86_64-linux-gnu/bits/select2.h \
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
+ /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
+ /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
+ /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
+ /usr/include/x86_64-linux-gnu/sys/stat.h \
+ /usr/include/x86_64-linux-gnu/bits/stat.h \
+ /usr/include/x86_64-linux-gnu/bits/statx.h /usr/include/linux/stat.h \
+ /usr/include/linux/types.h /usr/include/x86_64-linux-gnu/asm/types.h \
+ /usr/include/asm-generic/types.h /usr/include/asm-generic/int-ll64.h \
+ /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
+ /usr/include/asm-generic/bitsperlong.h /usr/include/linux/posix_types.h \
+ /usr/include/linux/stddef.h \
+ /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+ /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+ /usr/include/asm-generic/posix_types.h \
+ /usr/include/x86_64-linux-gnu/bits/statx-generic.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h \
+ /usr/include/stdlib.h /usr/include/x86_64-linux-gnu/bits/waitflags.h \
+ /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn.h \
+ /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
+ /usr/include/x86_64-linux-gnu/bits/types/locale_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h \
+ /usr/include/alloca.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
+ /usr/include/x86_64-linux-gnu/bits/stdlib.h /usr/include/string.h \
+ /usr/include/strings.h \
+ /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
+ /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
+ /usr/include/errno.h /usr/include/x86_64-linux-gnu/bits/errno.h \
+ /usr/include/linux/errno.h /usr/include/x86_64-linux-gnu/asm/errno.h \
+ /usr/include/asm-generic/errno.h /usr/include/asm-generic/errno-base.h \
+ /usr/include/x86_64-linux-gnu/bits/types/error_t.h /usr/include/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h /usr/include/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+ /usr/include/linux/falloc.h /usr/include/x86_64-linux-gnu/bits/fcntl2.h \
+ ../include/ansidecl.h ../bfd/bfdver.h ../include/fopen-same.h \
+ ../include/binary-io.h /usr/include/locale.h \
+ /usr/include/x86_64-linux-gnu/bits/locale.h \
+ /usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h \
+ /usr/include/limits.h /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+ /usr/include/linux/limits.h \
+ /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/uio_lim.h /usr/include/assert.h \
+ /usr/include/time.h /usr/include/x86_64-linux-gnu/bits/time.h \
+ /usr/include/x86_64-linux-gnu/bits/timex.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/zlib.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/zconf.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/zstd.h \
+ /usr/include/wchar.h /usr/include/x86_64-linux-gnu/bits/wchar.h \
+ /usr/include/x86_64-linux-gnu/bits/types/wint_t.h \
+ /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h \
+ /usr/include/x86_64-linux-gnu/bits/wchar2.h ../bfd/bfd.h \
+ ../include/symcat.h /usr/lib/gcc/x86_64-linux-gnu/9/include/stdint.h \
+ /usr/include/stdint.h /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
+ /usr/lib/gcc/x86_64-linux-gnu/9/include/stdbool.h \
+ ../include/diagnostics.h /usr/include/inttypes.h bucomm.h elfcomm.h \
+ ../include/aout/ar.h demanguse.h dwarf.h ../include/dwarf2.h \
+ ../include/dwarf2.def ../include/ctf-api.h ../include/ctf.h \
+ ../include/sframe-api.h ../include/sframe.h ../include/ansidecl.h \
+ ../include/demangle.h ../include/libiberty.h ../include/elf/common.h \
+ ../include/elf/external.h ../include/elf/internal.h ../include/elf/h8.h \
+ ../include/elf/reloc-macros.h ../include/elf/aarch64.h \
+ ../include/elf/alpha.h ../include/elf/amdgpu.h ../include/elf/arc.h \
+ ../include/elf/arc-reloc.def ../include/elf/arm.h ../include/elf/avr.h \
+ ../include/elf/bfin.h ../include/elf/cr16.h ../include/elf/cris.h \
+ ../include/elf/crx.h ../include/elf/csky.h ../include/elf/d10v.h \
+ ../include/elf/d30v.h ../include/elf/dlx.h ../include/elf/bpf.h \
+ ../include/elf/epiphany.h ../include/elf/fr30.h ../include/elf/frv.h \
+ ../include/elf/ft32.h ../include/elf/hppa.h ../include/elf/i386.h \
+ ../include/elf/i370.h ../include/elf/i860.h ../include/elf/i960.h \
+ ../include/elf/ia64.h ../include/elf/ip2k.h ../include/elf/lm32.h \
+ ../include/elf/iq2000.h ../include/elf/m32c.h ../include/elf/m32r.h \
+ ../include/elf/m68k.h ../include/elf/m68hc11.h ../include/elf/s12z.h \
+ ../include/elf/mcore.h ../include/elf/mep.h ../include/elf/metag.h \
+ ../include/elf/microblaze.h ../include/elf/mips.h ../include/elf/mmix.h \
+ ../include/elf/mn10200.h ../include/elf/mn10300.h ../include/elf/moxie.h \
+ ../include/elf/mt.h ../include/elf/msp430.h ../include/elf/nds32.h \
+ ../include/elf/nfp.h ../include/elf/nios2.h ../include/elf/or1k.h \
+ ../include/elf/pj.h ../include/elf/ppc.h ../include/elf/ppc64.h \
+ ../include/elf/pru.h ../include/elf/riscv.h ../include/libiberty.h \
+ ../include/elf/rl78.h ../include/elf/rx.h ../include/elf/s390.h \
+ ../include/elf/score.h ../include/elf/sh.h ../include/elf/sparc.h \
+ ../include/elf/spu.h ../include/elf/tic6x.h ../include/elf/tic6x-attrs.h \
+ ../include/elf/tilegx.h ../include/elf/tilepro.h ../include/elf/v850.h \
+ ../include/elf/vax.h ../include/elf/visium.h ../include/elf/wasm32.h \
+ ../include/elf/x86-64.h ../include/elf/xgate.h \
+ ../include/elf/xstormy16.h ../include/elf/xtensa.h ../include/elf/z80.h \
+ ../include/elf/loongarch.h ../include/getopt.h ../include/safe-ctype.h \
+ /usr/include/ctype.h ../include/filenames.h ../include/hashtab.h \
+ unwind-ia64.h
+
+/usr/include/stdc-predef.h:
+
+sysdep.h:
+
+config.h:
+
+/usr/include/stdio.h:
+
+/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
+
+/usr/include/features.h:
+
+/usr/include/x86_64-linux-gnu/sys/cdefs.h:
+
+/usr/include/x86_64-linux-gnu/bits/wordsize.h:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs.h:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/9/include/stddef.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/9/include/stdarg.h:
+
+/usr/include/x86_64-linux-gnu/bits/types.h:
+
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
+
+/usr/include/x86_64-linux-gnu/bits/typesizes.h:
+
+/usr/include/x86_64-linux-gnu/bits/time64.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__mbstate_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/FILE.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/cookie_io_functions_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/sys_errlist.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clock_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/time_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/endian.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/byteswap.h:
+
+/usr/include/byteswap.h:
+
+/usr/include/x86_64-linux-gnu/bits/byteswap.h:
+
+/usr/include/endian.h:
+
+/usr/include/x86_64-linux-gnu/bits/endian.h:
+
+/usr/include/x86_64-linux-gnu/bits/endianness.h:
+
+/usr/include/x86_64-linux-gnu/bits/uintn-identity.h:
+
+/usr/include/x86_64-linux-gnu/sys/select.h:
+
+/usr/include/x86_64-linux-gnu/bits/select.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
+
+/usr/include/x86_64-linux-gnu/bits/select2.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
+
+/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
+
+/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
+
+/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
+
+/usr/include/x86_64-linux-gnu/sys/stat.h:
+
+/usr/include/x86_64-linux-gnu/bits/stat.h:
+
+/usr/include/x86_64-linux-gnu/bits/statx.h:
+
+/usr/include/linux/stat.h:
+
+/usr/include/linux/types.h:
+
+/usr/include/x86_64-linux-gnu/asm/types.h:
+
+/usr/include/asm-generic/types.h:
+
+/usr/include/asm-generic/int-ll64.h:
+
+/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
+
+/usr/include/asm-generic/bitsperlong.h:
+
+/usr/include/linux/posix_types.h:
+
+/usr/include/linux/stddef.h:
+
+/usr/include/x86_64-linux-gnu/asm/posix_types.h:
+
+/usr/include/x86_64-linux-gnu/asm/posix_types_64.h:
+
+/usr/include/asm-generic/posix_types.h:
+
+/usr/include/x86_64-linux-gnu/bits/statx-generic.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_statx.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitflags.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
+
+/usr/include/x86_64-linux-gnu/bits/floatn.h:
+
+/usr/include/x86_64-linux-gnu/bits/floatn-common.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/locale_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/usr/include/alloca.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib.h:
+
+/usr/include/string.h:
+
+/usr/include/strings.h:
+
+/usr/include/x86_64-linux-gnu/bits/strings_fortified.h:
+
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
+
+/usr/include/errno.h:
+
+/usr/include/x86_64-linux-gnu/bits/errno.h:
+
+/usr/include/linux/errno.h:
+
+/usr/include/x86_64-linux-gnu/asm/errno.h:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/error_t.h:
+
+/usr/include/unistd.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix_opt.h:
+
+/usr/include/x86_64-linux-gnu/bits/environments.h:
+
+/usr/include/x86_64-linux-gnu/bits/confname.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_core.h:
+
+/usr/include/x86_64-linux-gnu/bits/unistd.h:
+
+/usr/include/x86_64-linux-gnu/bits/unistd_ext.h:
+
+/usr/include/fcntl.h:
+
+/usr/include/x86_64-linux-gnu/bits/fcntl.h:
+
+/usr/include/x86_64-linux-gnu/bits/fcntl-linux.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
+
+/usr/include/linux/falloc.h:
+
+/usr/include/x86_64-linux-gnu/bits/fcntl2.h:
+
+../include/ansidecl.h:
+
+../bfd/bfdver.h:
+
+../include/fopen-same.h:
+
+../include/binary-io.h:
+
+/usr/include/locale.h:
+
+/usr/include/x86_64-linux-gnu/bits/locale.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/9/include/limits.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/9/include/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/uio_lim.h:
+
+/usr/include/assert.h:
+
+/usr/include/time.h:
+
+/usr/include/x86_64-linux-gnu/bits/time.h:
+
+/usr/include/x86_64-linux-gnu/bits/timex.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/zlib.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/zconf.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/zstd.h:
+
+/usr/include/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/wchar2.h:
+
+../bfd/bfd.h:
+
+../include/symcat.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/9/include/stdint.h:
+
+/usr/include/stdint.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/9/include/stdbool.h:
+
+../include/diagnostics.h:
+
+/usr/include/inttypes.h:
+
+bucomm.h:
+
+elfcomm.h:
+
+../include/aout/ar.h:
+
+demanguse.h:
+
+dwarf.h:
+
+../include/dwarf2.h:
+
+../include/dwarf2.def:
+
+../include/ctf-api.h:
+
+../include/ctf.h:
+
+../include/sframe-api.h:
+
+../include/sframe.h:
+
+../include/ansidecl.h:
+
+../include/demangle.h:
+
+../include/libiberty.h:
+
+../include/elf/common.h:
+
+../include/elf/external.h:
+
+../include/elf/internal.h:
+
+../include/elf/h8.h:
+
+../include/elf/reloc-macros.h:
+
+../include/elf/aarch64.h:
+
+../include/elf/alpha.h:
+
+../include/elf/amdgpu.h:
+
+../include/elf/arc.h:
+
+../include/elf/arc-reloc.def:
+
+../include/elf/arm.h:
+
+../include/elf/avr.h:
+
+../include/elf/bfin.h:
+
+../include/elf/cr16.h:
+
+../include/elf/cris.h:
+
+../include/elf/crx.h:
+
+../include/elf/csky.h:
+
+../include/elf/d10v.h:
+
+../include/elf/d30v.h:
+
+../include/elf/dlx.h:
+
+../include/elf/bpf.h:
+
+../include/elf/epiphany.h:
+
+../include/elf/fr30.h:
+
+../include/elf/frv.h:
+
+../include/elf/ft32.h:
+
+../include/elf/hppa.h:
+
+../include/elf/i386.h:
+
+../include/elf/i370.h:
+
+../include/elf/i860.h:
+
+../include/elf/i960.h:
+
+../include/elf/ia64.h:
+
+../include/elf/ip2k.h:
+
+../include/elf/lm32.h:
+
+../include/elf/iq2000.h:
+
+../include/elf/m32c.h:
+
+../include/elf/m32r.h:
+
+../include/elf/m68k.h:
+
+../include/elf/m68hc11.h:
+
+../include/elf/s12z.h:
+
+../include/elf/mcore.h:
+
+../include/elf/mep.h:
+
+../include/elf/metag.h:
+
+../include/elf/microblaze.h:
+
+../include/elf/mips.h:
+
+../include/elf/mmix.h:
+
+../include/elf/mn10200.h:
+
+../include/elf/mn10300.h:
+
+../include/elf/moxie.h:
+
+../include/elf/mt.h:
+
+../include/elf/msp430.h:
+
+../include/elf/nds32.h:
+
+../include/elf/nfp.h:
+
+../include/elf/nios2.h:
+
+../include/elf/or1k.h:
+
+../include/elf/pj.h:
+
+../include/elf/ppc.h:
+
+../include/elf/ppc64.h:
+
+../include/elf/pru.h:
+
+../include/elf/riscv.h:
+
+../include/libiberty.h:
+
+../include/elf/rl78.h:
+
+../include/elf/rx.h:
+
+../include/elf/s390.h:
+
+../include/elf/score.h:
+
+../include/elf/sh.h:
+
+../include/elf/sparc.h:
+
+../include/elf/spu.h:
+
+../include/elf/tic6x.h:
+
+../include/elf/tic6x-attrs.h:
+
+../include/elf/tilegx.h:
+
+../include/elf/tilepro.h:
+
+../include/elf/v850.h:
+
+../include/elf/vax.h:
+
+../include/elf/visium.h:
+
+../include/elf/wasm32.h:
+
+../include/elf/x86-64.h:
+
+../include/elf/xgate.h:
+
+../include/elf/xstormy16.h:
+
+../include/elf/xtensa.h:
+
+../include/elf/z80.h:
+
+../include/elf/loongarch.h:
+
+../include/getopt.h:
+
+../include/safe-ctype.h:
+
+/usr/include/ctype.h:
+
+../include/filenames.h:
+
+../include/hashtab.h:
+
+unwind-ia64.h:

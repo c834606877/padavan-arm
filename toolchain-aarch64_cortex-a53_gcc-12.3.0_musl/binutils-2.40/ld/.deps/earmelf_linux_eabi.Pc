@@ -1,0 +1,1 @@
+earmelf_linux_eabi.c: ./emulparams/armelf_linux_eabi.sh ./emulparams/armelf_linux.sh ./scripttempl/elf.sc ./emultempl/elf.em ./emultempl/elf-generic.em ./emultempl/armelf.em ./emultempl/emulation.em

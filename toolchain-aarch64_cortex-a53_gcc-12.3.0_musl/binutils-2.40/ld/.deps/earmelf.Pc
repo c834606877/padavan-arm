@@ -1,0 +1,1 @@
+earmelf.c: ./emulparams/armelf.sh ./scripttempl/elf.sc ./emultempl/elf.em ./emultempl/elf-generic.em ./emultempl/armelf.em ./emultempl/emulation.em

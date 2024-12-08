@@ -1,0 +1,425 @@
+dwarf2/dwz.o: dwarf2/dwz.c defs.h ../gdbsupport/common-defs.h \
+ ../gdbsupport/config.h ../gnulib/config.h ../gnulib/import/stdio.h \
+ ../gnulib/import/stdlib.h ../gnulib/import/string.h \
+ ../include/ansidecl.h ../include/libiberty.h ../include/ansidecl.h \
+ ../gnulib/import/pathmax.h ../gnulib/import/unistd.h \
+ ../gnulib/import/limits.h ../include/gdb/signals.h \
+ ../include/gdb/signals.def ../gdbsupport/gdb_locale.h \
+ ../gnulib/import/locale.h ../gdbsupport/ptid.h \
+ ../gdbsupport/common-types.h ../gnulib/import/inttypes.h \
+ ../gdbsupport/common-types.h ../gdbsupport/common-utils.h \
+ ../gdbsupport/byte-vector.h ../gdbsupport/def-vector.h \
+ ../gdbsupport/default-init-alloc.h ../gdbsupport/gdb_unique_ptr.h \
+ ../gdbsupport/gdb-xfree.h ../gdbsupport/poison.h ../gdbsupport/traits.h \
+ ../include/obstack.h ../gdbsupport/poison.h \
+ ../gdbsupport/gdb_string_view.h ../gdbsupport/gdb_assert.h \
+ ../gdbsupport/errors.h ../gdbsupport/gdb_string_view.tcc \
+ ../gdbsupport/print-utils.h ../gdbsupport/common-debug.h \
+ ../gdbsupport/gdb_optional.h ../gdbsupport/traits.h \
+ ../gdbsupport/preprocessor.h ../gdbsupport/cleanups.h \
+ ../gdbsupport/common-exceptions.h config.h ../bfd/bfd.h \
+ ../include/symcat.h ../include/diagnostics.h ../gnulib/import/sys/stat.h \
+ ../gnulib/import/fcntl.h gdb_wchar.h ../gnulib/import/wctype.h ui-file.h \
+ ui-style.h ../gdbsupport/host-defs.h ../gdbsupport/enum-flags.h \
+ ../gdbsupport/array-view.h ../include/hashtab.h ../include/fopen-bin.h \
+ utils.h exceptions.h ui-out.h ../gdbsupport/scoped_restore.h \
+ dwarf2/dwz.h gdb_bfd.h registry.h ../gdbsupport/gdb_ref_ptr.h \
+ ../gdbsupport/iterator-range.h ../gdbsupport/next-iterator.h \
+ dwarf2/index-cache.h dwarf2/index-common.h symfile.h symtab.h \
+ ../gdbsupport/gdb_vecs.h gdbtypes.h ../gdbsupport/gdb-hashtab.h \
+ ../gdbsupport/offset-type.h ../gdbsupport/underlying.h \
+ ../gdbsupport/print-utils.h ../include/dwarf2.h ../include/dwarf2.def \
+ ../gdbsupport/gdb_obstack.h gmp-utils.h defs.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/gmp.h \
+ ../gdbsupport/gdb_regex.h ../include/xregex.h ../include/xregex2.h \
+ ../gdbsupport/function-view.h ../gdbsupport/gdb_string_view.h \
+ completer.h command.h gdb-demangle.h minsyms.h probe.h \
+ symfile-add-flags.h objfile-flags.h gdb_bfd.h target-section.h \
+ quick-symbol.h dwarf2/section.h build-id.h ../gdbsupport/rsp-low.h \
+ debuginfod-support.h ../gdbsupport/scoped_fd.h ../gdbsupport/gdb_file.h \
+ dwarf2/read.h dwarf2/comp-unit-head.h dwarf2/leb.h gdbtypes.h \
+ dwarf2/file-and-dir.h objfiles.h symfile.h progspace.h target.h infrun.h \
+ gdbthread.h breakpoint.h frame.h language.h expression.h \
+ std-operator.def cli/cli-option.h completer.h command.h \
+ ../gdbsupport/common-debug.h unwind_stop_reasons.def value.h extension.h \
+ mi/mi-cmds.h mi/mi-main.h ax.h ../gdbsupport/ax.def \
+ ../gdbsupport/break-common.h location.h \
+ ../gdbsupport/filtered-iterator.h ../gdbsupport/refcounted-object.h \
+ ../gdbsupport/safe-iterator.h cli/cli-script.h btrace.h \
+ ../gdbsupport/btrace-common.h target/waitstatus.h \
+ ../gdbsupport/gdb_signals.h cli/cli-utils.h \
+ ../gdbsupport/common-gdbthread.h ../gdbsupport/forward-scope-exit.h \
+ ../gdbsupport/scope-exit.h displaced-stepping.h \
+ ../gdbsupport/intrusive_list.h thread-fsm.h mi/mi-common.h interps.h \
+ thread-iter.h ../gdbsupport/reference-to-pointer-iterator.h \
+ target/target.h target/waitstatus.h target/wait.h target/resume.h \
+ target/wait.h memattr.h record.h disasm.h ../include/dis-asm.h \
+ tracepoint.h memrange.h solist.h psymtab.h bcache.h gdbarch.h osabi.h \
+ regcache.h ../gdbsupport/common-regcache.h gdbarch-gen.h jit.h \
+ filename-seen-cache.h ../gdbsupport/hash_enum.h psympriv.h objfiles.h \
+ dwarf2/sect-names.h ../include/filenames.h ../include/hashtab.h \
+ gdbcore.h exec.h ../gdbsupport/pathstuff.h
+
+defs.h:
+
+../gdbsupport/common-defs.h:
+
+../gdbsupport/config.h:
+
+../gnulib/config.h:
+
+../gnulib/import/stdio.h:
+
+../gnulib/import/stdlib.h:
+
+../gnulib/import/string.h:
+
+../include/ansidecl.h:
+
+../include/libiberty.h:
+
+../include/ansidecl.h:
+
+../gnulib/import/pathmax.h:
+
+../gnulib/import/unistd.h:
+
+../gnulib/import/limits.h:
+
+../include/gdb/signals.h:
+
+../include/gdb/signals.def:
+
+../gdbsupport/gdb_locale.h:
+
+../gnulib/import/locale.h:
+
+../gdbsupport/ptid.h:
+
+../gdbsupport/common-types.h:
+
+../gnulib/import/inttypes.h:
+
+../gdbsupport/common-types.h:
+
+../gdbsupport/common-utils.h:
+
+../gdbsupport/byte-vector.h:
+
+../gdbsupport/def-vector.h:
+
+../gdbsupport/default-init-alloc.h:
+
+../gdbsupport/gdb_unique_ptr.h:
+
+../gdbsupport/gdb-xfree.h:
+
+../gdbsupport/poison.h:
+
+../gdbsupport/traits.h:
+
+../include/obstack.h:
+
+../gdbsupport/poison.h:
+
+../gdbsupport/gdb_string_view.h:
+
+../gdbsupport/gdb_assert.h:
+
+../gdbsupport/errors.h:
+
+../gdbsupport/gdb_string_view.tcc:
+
+../gdbsupport/print-utils.h:
+
+../gdbsupport/common-debug.h:
+
+../gdbsupport/gdb_optional.h:
+
+../gdbsupport/traits.h:
+
+../gdbsupport/preprocessor.h:
+
+../gdbsupport/cleanups.h:
+
+../gdbsupport/common-exceptions.h:
+
+config.h:
+
+../bfd/bfd.h:
+
+../include/symcat.h:
+
+../include/diagnostics.h:
+
+../gnulib/import/sys/stat.h:
+
+../gnulib/import/fcntl.h:
+
+gdb_wchar.h:
+
+../gnulib/import/wctype.h:
+
+ui-file.h:
+
+ui-style.h:
+
+../gdbsupport/host-defs.h:
+
+../gdbsupport/enum-flags.h:
+
+../gdbsupport/array-view.h:
+
+../include/hashtab.h:
+
+../include/fopen-bin.h:
+
+utils.h:
+
+exceptions.h:
+
+ui-out.h:
+
+../gdbsupport/scoped_restore.h:
+
+dwarf2/dwz.h:
+
+gdb_bfd.h:
+
+registry.h:
+
+../gdbsupport/gdb_ref_ptr.h:
+
+../gdbsupport/iterator-range.h:
+
+../gdbsupport/next-iterator.h:
+
+dwarf2/index-cache.h:
+
+dwarf2/index-common.h:
+
+symfile.h:
+
+symtab.h:
+
+../gdbsupport/gdb_vecs.h:
+
+gdbtypes.h:
+
+../gdbsupport/gdb-hashtab.h:
+
+../gdbsupport/offset-type.h:
+
+../gdbsupport/underlying.h:
+
+../gdbsupport/print-utils.h:
+
+../include/dwarf2.h:
+
+../include/dwarf2.def:
+
+../gdbsupport/gdb_obstack.h:
+
+gmp-utils.h:
+
+defs.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include/gmp.h:
+
+../gdbsupport/gdb_regex.h:
+
+../include/xregex.h:
+
+../include/xregex2.h:
+
+../gdbsupport/function-view.h:
+
+../gdbsupport/gdb_string_view.h:
+
+completer.h:
+
+command.h:
+
+gdb-demangle.h:
+
+minsyms.h:
+
+probe.h:
+
+symfile-add-flags.h:
+
+objfile-flags.h:
+
+gdb_bfd.h:
+
+target-section.h:
+
+quick-symbol.h:
+
+dwarf2/section.h:
+
+build-id.h:
+
+../gdbsupport/rsp-low.h:
+
+debuginfod-support.h:
+
+../gdbsupport/scoped_fd.h:
+
+../gdbsupport/gdb_file.h:
+
+dwarf2/read.h:
+
+dwarf2/comp-unit-head.h:
+
+dwarf2/leb.h:
+
+gdbtypes.h:
+
+dwarf2/file-and-dir.h:
+
+objfiles.h:
+
+symfile.h:
+
+progspace.h:
+
+target.h:
+
+infrun.h:
+
+gdbthread.h:
+
+breakpoint.h:
+
+frame.h:
+
+language.h:
+
+expression.h:
+
+std-operator.def:
+
+cli/cli-option.h:
+
+completer.h:
+
+command.h:
+
+../gdbsupport/common-debug.h:
+
+unwind_stop_reasons.def:
+
+value.h:
+
+extension.h:
+
+mi/mi-cmds.h:
+
+mi/mi-main.h:
+
+ax.h:
+
+../gdbsupport/ax.def:
+
+../gdbsupport/break-common.h:
+
+location.h:
+
+../gdbsupport/filtered-iterator.h:
+
+../gdbsupport/refcounted-object.h:
+
+../gdbsupport/safe-iterator.h:
+
+cli/cli-script.h:
+
+btrace.h:
+
+../gdbsupport/btrace-common.h:
+
+target/waitstatus.h:
+
+../gdbsupport/gdb_signals.h:
+
+cli/cli-utils.h:
+
+../gdbsupport/common-gdbthread.h:
+
+../gdbsupport/forward-scope-exit.h:
+
+../gdbsupport/scope-exit.h:
+
+displaced-stepping.h:
+
+../gdbsupport/intrusive_list.h:
+
+thread-fsm.h:
+
+mi/mi-common.h:
+
+interps.h:
+
+thread-iter.h:
+
+../gdbsupport/reference-to-pointer-iterator.h:
+
+target/target.h:
+
+target/waitstatus.h:
+
+target/wait.h:
+
+target/resume.h:
+
+target/wait.h:
+
+memattr.h:
+
+record.h:
+
+disasm.h:
+
+../include/dis-asm.h:
+
+tracepoint.h:
+
+memrange.h:
+
+solist.h:
+
+psymtab.h:
+
+bcache.h:
+
+gdbarch.h:
+
+osabi.h:
+
+regcache.h:
+
+../gdbsupport/common-regcache.h:
+
+gdbarch-gen.h:
+
+jit.h:
+
+filename-seen-cache.h:
+
+../gdbsupport/hash_enum.h:
+
+psympriv.h:
+
+objfiles.h:
+
+dwarf2/sect-names.h:
+
+../include/filenames.h:
+
+../include/hashtab.h:
+
+gdbcore.h:
+
+exec.h:
+
+../gdbsupport/pathstuff.h:

@@ -1,0 +1,3 @@
+xml-builtin.o: xml-builtin.c xml-builtin.h
+
+xml-builtin.h:

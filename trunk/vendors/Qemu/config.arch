@@ -1,0 +1,33 @@
+.EXPORT_ALL_VARIABLES:
+
+###########################################################################
+
+ENDIAN = little
+
+#-EL  -maarch64elf -z noexecstack --no-warn-rwx-segments" "--no-undefined -X --fix-cortex-a53-843419
+#
+#CPUFLAGS = -maarch64elf -march=aarch64elf -X --fix-cortex-a53-843419
+#CPUFLAGS = -march=armv8.5-a -mfix-cortex-a53-843419
+CPUFLAGS = -march=armv8-a -mfix-cortex-a53-843419
+
+ifeq ($(CONFIG_PRODUCT),MT7621)
+#CPUFLAGS += -mtune=1004kc
+else
+ifeq ($(CONFIG_PRODUCT),RT3883)
+#CPUFLAGS += -mtune=74kc
+else
+#CPUFLAGS += -mtune=24kec
+endif
+endif
+
+VENDOR_CFLAGS =
+UOPT = -Os
+LOPT = -Os
+HOST_TARGET = aarch64-linux
+
+###########################################################################
+
+include $(ROOTDIR)/vendors/config/aarch64/config.arch
+
+###########################################################################
+
