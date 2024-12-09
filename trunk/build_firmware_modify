@@ -17,6 +17,7 @@ cp -f configs/templates/$1.config .config
 
 ROOTDIR=`pwd`
 export ROOTDIR=$ROOTDIR
+export STAGING_DIR=$ROOTDIR/stage
 
 kernel_id="5.15.167"
 kernel_cf=""
