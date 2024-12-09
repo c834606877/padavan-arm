@@ -23,7 +23,7 @@ config_test:
 	fi )
 
 configure:
-	( cd $(SRC_NAME) ; \
+	( cd $(SRC_NAME) ; autoreconf -ivf;\
 	sh autogen.sh; \
 	sed -e 's/#undef malloc.*//g' -e 's/#undef realloc.*//g' -i config.h.in; \
 	./configure \
