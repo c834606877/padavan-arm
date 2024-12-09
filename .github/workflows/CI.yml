@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext
-          sudo apt install aclocal-1.15 groff automake-1.15
+          sudo apt install groff 
 #      - name: Run shellcheck
 #        run: sh ./trunk/tools/shellcheck.sh
 #      - name: Prepare toolchain
