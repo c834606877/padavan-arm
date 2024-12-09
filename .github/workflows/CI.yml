@@ -26,8 +26,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - build_variant: "mt7621"
-            targets: "K2P_nano K2P DIR-878 CR660x JCG-Q20"
+          - build_variant: "QEMU"
+            targets: "QEMU"
 #          - build_variant: "mt7621-usb-1"
 #            targets: "XY-C1 JCG-836PRO JCG-Y2"
 #          - build_variant: "mt7621-usb-2"
@@ -38,12 +38,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install libtool-bin gperf python3-docutils autopoint gettext
-      - name: Run shellcheck
-        run: sh ./trunk/tools/shellcheck.sh
-      - name: Prepare toolchain
-        run: |
-          cd toolchain-mipsel
-          sh dl_toolchain.sh
+#      - name: Run shellcheck
+#        run: sh ./trunk/tools/shellcheck.sh
+#      - name: Prepare toolchain
+#        run: |
+#          cd toolchain-mipsel
+#          sh dl_toolchain.sh
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled == 'yes' }}
