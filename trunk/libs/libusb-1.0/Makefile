@@ -22,7 +22,7 @@ config_test:
 	fi )
 
 configure:
-	( cd $(SRC_NAME) ; \
+	( cd $(SRC_NAME) ; autoreconf -f -i; \
 	ac_cv_lib_rt_clock_gettime=no \
 	./configure \
 		--prefix=$(STAGEDIR) \
