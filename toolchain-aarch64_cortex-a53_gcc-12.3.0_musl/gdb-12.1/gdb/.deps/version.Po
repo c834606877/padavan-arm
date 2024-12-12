@@ -1,0 +1,3 @@
+version.o: version.c ../gdbsupport/version.h
+
+../gdbsupport/version.h:

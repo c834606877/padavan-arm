@@ -1,0 +1,16 @@
+names.lo: \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/names.cc \
+ /usr/include/stdc-predef.h cc1plugin-config.h \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/names.hh \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/../include/gcc-c-fe.def \
+ /home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/../include/gcc-cp-fe.def
+
+/usr/include/stdc-predef.h:
+
+cc1plugin-config.h:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/names.hh:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/../include/gcc-c-fe.def:
+
+/home/user/workdir/openwrt-fs/openwrt-23.05.5/build_dir/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl/gcc-12.3.0/libcc1/../include/gcc-cp-fe.def:

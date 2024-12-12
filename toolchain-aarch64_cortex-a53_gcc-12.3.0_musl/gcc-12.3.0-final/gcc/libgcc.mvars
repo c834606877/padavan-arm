@@ -1,0 +1,4 @@
+GCC_CFLAGS = -Os -pipe -mcpu=cortex-a53 -fno-caller-saves -fno-plt -fhonour-copts -Wformat -Werror=format-security -fstack-protector -D_FORTIFY_SOURCE=1 -Wl,-z,now -Wl,-z,relro -g -Os -DIN_GCC  -DCROSS_DIRECTORY_STRUCTURE  -W -Wall -Wno-narrowing -Wwrite-strings -Wcast-qual -Wstrict-prototypes -Wmissing-prototypes -Wold-style-definition  -isystem ./include 
+INHIBIT_LIBC_CFLAGS = 
+TARGET_SYSTEM_ROOT = 
+NO_PIE_CFLAGS = 

@@ -1,0 +1,37 @@
+lang.all.cross:  c.all.cross c++.all.cross lto.all.cross
+lang.start.encap:  c.start.encap c++.start.encap lto.start.encap
+lang.rest.encap:  c.rest.encap c++.rest.encap lto.rest.encap
+lang.tags:  c.tags c++.tags lto.tags
+lang.install-common:  c.install-common c++.install-common lto.install-common
+lang.install-man:  c.install-man c++.install-man lto.install-man
+lang.install-info:  c.install-info c++.install-info lto.install-info
+lang.install-dvi:  c.install-dvi c++.install-dvi lto.install-dvi
+lang.install-pdf:  c.install-pdf c++.install-pdf lto.install-pdf
+lang.install-html:  c.install-html c++.install-html lto.install-html
+lang.dvi:  c.dvi c++.dvi lto.dvi
+lang.pdf:  c.pdf c++.pdf lto.pdf
+lang.html:  c.html c++.html lto.html
+lang.uninstall:  c.uninstall c++.uninstall lto.uninstall
+lang.info:  c.info c++.info lto.info
+lang.man:  c.man c++.man lto.man
+lang.srcextra:  c.srcextra c++.srcextra lto.srcextra
+lang.srcman:  c.srcman c++.srcman lto.srcman
+lang.srcinfo:  c.srcinfo c++.srcinfo lto.srcinfo
+lang.mostlyclean:  c.mostlyclean c++.mostlyclean lto.mostlyclean
+lang.clean:  c.clean c++.clean lto.clean
+lang.distclean:  c.distclean c++.distclean lto.distclean
+lang.maintainer-clean:  c.maintainer-clean c++.maintainer-clean lto.maintainer-clean
+lang.install-plugin:  c.install-plugin c++.install-plugin lto.install-plugin
+ifeq ($(DO_LINK_SERIALIZATION),)
+SERIAL_LIST =
+else
+SERIAL_LIST = $(wordlist $(DO_LINK_SERIALIZATION),3, lto1 c++ c)
+endif
+SERIAL_COUNT = 4
+INDEX.c = 0
+c++.prev = $(if $(word 3,$(SERIAL_LIST)),$($(word 3,$(SERIAL_LIST)).serial))
+INDEX.c++ = 1
+lto1.prev = $(if $(word 2,$(SERIAL_LIST)),$($(word 2,$(SERIAL_LIST)).serial))
+INDEX.lto1 = 2
+lto2.prev = $(if $(word 1,$(SERIAL_LIST)),$($(word 1,$(SERIAL_LIST)).serial))
+INDEX.lto2 = 3

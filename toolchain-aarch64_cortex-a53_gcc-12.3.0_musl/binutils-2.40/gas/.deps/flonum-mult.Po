@@ -1,0 +1,10 @@
+flonum-mult.o: flonum-mult.c /usr/include/stdc-predef.h \
+ ../include/ansidecl.h flonum.h bignum.h
+
+/usr/include/stdc-predef.h:
+
+../include/ansidecl.h:
+
+flonum.h:
+
+bignum.h:

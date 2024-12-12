@@ -1,0 +1,41 @@
+# This file is a shell script that caches the results of configure
+# tests run on this system so they can be shared between configure
+# scripts and configure runs, see configure's option --config-cache.
+# It is not useful on other systems.  If it contains results you don't
+# want to keep, you may remove or edit it.
+#
+# config.status only pays attention to the cache file if you give it
+# the --recheck option to rerun configure.
+#
+# `ac_cv_env_foo' variables (set or unset) will be overridden when
+# loading this file, other *unset* `ac_cv_foo' will be assigned the
+# following values.
+
+ac_cv_build=${ac_cv_build=x86_64-pc-linux-gnu}
+ac_cv_cxx_compiler_gnu=${ac_cv_cxx_compiler_gnu=yes}
+ac_cv_env_CCC_set=
+ac_cv_env_CCC_value=
+ac_cv_env_CPPFLAGS_set=
+ac_cv_env_CPPFLAGS_value=
+ac_cv_env_CXXFLAGS_set=set
+ac_cv_env_CXXFLAGS_value='-O2 -I/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/include  -pipe    '
+ac_cv_env_CXX_set=set
+ac_cv_env_CXX_value=g++
+ac_cv_env_LDFLAGS_set=set
+ac_cv_env_LDFLAGS_value='-static-libstdc++ -static-libgcc '
+ac_cv_env_LIBS_set=
+ac_cv_env_LIBS_value=
+ac_cv_env_build_alias_set=set
+ac_cv_env_build_alias_value=x86_64-pc-linux-gnu
+ac_cv_env_host_alias_set=set
+ac_cv_env_host_alias_value=x86_64-pc-linux-gnu
+ac_cv_env_target_alias_set=set
+ac_cv_env_target_alias_value=aarch64-openwrt-linux-musl
+ac_cv_host=${ac_cv_host=x86_64-pc-linux-gnu}
+ac_cv_objext=${ac_cv_objext=o}
+ac_cv_prog_AR=${ac_cv_prog_AR=ar}
+ac_cv_prog_RANLIB=${ac_cv_prog_RANLIB=ranlib}
+ac_cv_prog_cxx_g=${ac_cv_prog_cxx_g=yes}
+ac_cv_search_ZSTD_compress=${ac_cv_search_ZSTD_compress='/home/user/workdir/openwrt-fs/openwrt-23.05.5/staging_dir/host/lib/libzstd.a -pthread'}
+gcc_cv_libc_provides_ssp=${gcc_cv_libc_provides_ssp=yes}
+libgcc_cv_fixed_point=${libgcc_cv_fixed_point=no}

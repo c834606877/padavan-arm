@@ -1,0 +1,10 @@
+TODO:
+
+1. add eth TX/RX status in user/httpd  switch
+
+2. fix user/rc/net_lan.c  "SWAPI_LINK_FLOW_CONTROL_DISABLE" or some ETH dedicated related thing
+check  linux-4.4.x/drivers/net/ethernet/raeth/mtk_esw/ioctl.h
+
+3. fix ./user/rc/net_lan.c  alos as the same
+       user/rc/net_wan.c also 
+
