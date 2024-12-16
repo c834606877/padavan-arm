@@ -48,20 +48,18 @@ fakeroot ./build_firmware_modify QEMU
 __Run on QEMU__
 
 ``` bash
-qemu-system-aarch64 -m 512 -cpu cortex-a53 -M virt-2.9  -kernel ~/workdir/Image.gz  -D qemu_a53.log -nographic -initrd ~/workdir/ramdisk -append "root=/dev/ram0" -device virtio-net-pci,netdev=net0 -netdev user,id=net0
+qemu-system-aarch64 -m 512 -cpu cortex-a53 -M virt-2.9  -kernel ~/workdir/Image.gz  -D qemu_a53.log -nographic -initrd ~/workdir/ramdisk -append "root=/dev/ram0" -device virtio-net-pci,netdev=net0 -netdev user,id=net0,hostfwd=tcp:127.0.0.1:8800-10.0.2.15:80
 
 Enable eth0:
 
 ip link set eth0 up
 ip addr add 10.0.2.15/24 dev eth0
-ip route add default via 192.0.2.2 dev eth0
+ip route add default via 10.0.2.2 dev eth0
 
 # check the virt gateway
 ping 10.0.2.2
 
 ```
-
-
 
 
 # padavan-4.4 #

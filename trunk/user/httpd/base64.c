@@ -16,6 +16,7 @@
  */
 
 #include <stdlib.h>
+#include <stdint.h>
 
 /* Base-64 decoding.  This represents binary data as printable ASCII
 ** characters.  Three 8-bit binary bytes are turned into four 6-bit
@@ -32,7 +33,7 @@ static const char b64_decode_table[256] = {
     -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 00-0F */
     -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,  /* 10-1F */
     -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,62,-1,-1,-1,63,  /* 20-2F */
-    52,53,54,55,56,57,58,59,60,61,-1,-1,-1,-1,-1,-1,  /* 30-3F */
+    52,53,54,55,56,57,58,59,60,61,-1,-1,-1, 0,-1,-1,  /* 30-3F */
     -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,  /* 40-4F */
     15,16,17,18,19,20,21,22,23,24,25,-1,-1,-1,-1,-1,  /* 50-5F */
     -1,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,  /* 60-6F */
@@ -56,14 +57,14 @@ int
 b64_decode(const char* str, unsigned char* space, int size )
 {
 	const char* cp;
-	int d, prev_d = 0;
+	uint32_t d, prev_d = 0;
 	int space_idx, phase;
 	unsigned char c;
 
 	space_idx = 0;
 	phase = 0;
 	for ( cp = str; *cp != '\0'; ++cp ) {
-		d = (int)b64_decode_table[(int)*cp];
+		d = (uint32_t)b64_decode_table[(int)*cp];
 		if ( d != -1 ) {
 			switch ( phase )
 			{
