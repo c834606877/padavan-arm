@@ -39,8 +39,9 @@ apt-get install -y sudo time git-core subversion build-essential g++ bash make \
 
 ``` bash
 
-cd truck
+cd trunk
 fakeroot ./build_firmware_modify QEMU
+fakeroot ./build_firmware_modify RAX3000M
 
 ```
 
@@ -60,6 +61,12 @@ ip route add default via 10.0.2.2 dev eth0
 ping 10.0.2.2
 
 ```
+
+
+__Run on RAX3000M__
+
+
+
 
 
 # padavan-4.4 #

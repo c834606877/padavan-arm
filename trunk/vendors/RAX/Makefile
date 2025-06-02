@@ -17,11 +17,19 @@ else
 PART_ALIGN	= 16
 endif
 
-ifeq ($(CONFIG_PRODUCT),MT7621)
-LOAD_ADDR = 81001000
+ifeq ($(CONFIG_PRODUCT),MT7981)
+LOAD_ADDR = 48000000
 else
 LOAD_ADDR = 80000000
 endif
+
+MKITS_SH = $(ROOTDIR)/tools/mkits.sh
+DTC = $(ROOTDIR)/$(LINUXDIR)/scripts/dtc/dtc
+DTC_DIR = $(ROOTDIR)/$(LINUXDIR)/scripts/dtc/
+SYSUPGRADE_TAR_SH = $(ROOTDIR)/tools/sysupgrade-tar.sh
+#sysupgrade-tar.sh [--board boardname] [--kernel kernelimage] [--rootfs rootfs] out
+
+UBOOT_MKIMAGE	:= $(ROOTDIR)/tools/u-boot/mkimage
 
 ifeq ($(CONFIG_WITHOUT_KERNEL),y)
 ENTRY_CMD = $(MKIMAGE_DIR)/mkimage -l $(UBOOT_HEADER) 2>/dev/null |grep "Entry" |awk '{print $$3}'
@@ -70,7 +78,7 @@ romfs.post::
 	rm -f $(KERNELZ).*
 	$(ROOTDIR)/tools/mksquashfs_xz/mksquashfs $(ROMFSDIR) $(RAMDISK) -all-root -no-exports -noappend -nopad -noI -no-xattrs
 
-image:
+image_bak:
 	##############CREATE IMAGE#################
 ifeq ($(CONFIG_WITHOUT_KERNEL),y)
 	cd $(IMAGEDIR) ; rm -f $(KERNELZ).*; \
@@ -104,3 +112,28 @@ endif
 	KRN_SIZE=`expr $$ISIZE - $$RSIZE + 64` ; \
 	$(MKIMAGE_DIR)/mkimage -A arm -O linux -T kernel -C $(COMP) -a $(LOAD_ADDR) -e $$ENTRY -k $$KRN_SIZE \
 	-n $(CONFIG_FIRMWARE_PRODUCT_ID) -V $(FIRMWARE_KERNEL_VER) $(FIRMWARE_ROOTFS_VER) -d $(KERNELZ).$(COMP) $(IMAGE)
+
+
+
+image:
+	##############CREATE IMAGE#################
+ifeq ($(CONFIG_WITHOUT_KERNEL),y)
+	cd $(IMAGEDIR) ; rm -f $(KERNELZ).*; \
+	cp -f $(MERGE_DIR)/$(CONFIG_FIRMWARE_PRODUCT_ID)/kernel.bin $(KERNELZ).$(COMP)
+else
+	$(CROSS_COMPILE)objcopy -O binary -R .note -R .comment -S $(ROOTDIR)/$(LINUXDIR)/vmlinux $(KERNELZ)
+ifeq ($(CONFIG_KERNEL_NO_COMPRESS),y)
+	cd $(IMAGEDIR); rm -f $(KERNELZ).*; mv -f $(KERNELZ) $(KERNELZ).$(COMP)
+else
+	#cd $(IMAGEDIR); rm -f $(KERNELZ).*; $(ROOTDIR)/tools/lzma/lzma e -a1 -d25 $(KERNELZ) $(KERNELZ).$(COMP)
+	cd $(IMAGEDIR); rm -f $(KERNELZ).*; $(ROOTDIR)/tools/lzma/lzma e -lc1 -lp2 -pb2  $(KERNELZ) $(KERNELZ).$(COMP)
+endif
+endif
+
+	#$(DTC) -I dts -O dtb -o RAX3000M_fit_file.fit  RAX3000M_its_file.its ;
+	cd $(IMAGEDIR); \
+	ENTRY=`LANG=C LC_ALL=C $(ENTRY_CMD)` ; \
+	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o RAX3000M_its_file.its -c config-1 -D cmcc_rax3000m-emmc-ubootmod -d $(ROOTDIR)/kernel_5.15_immortalwrt_dtb.dtb; \
+	PATH=$(DTC_DIR):$(PATH) $(UBOOT_MKIMAGE) -f RAX3000M_its_file.its RAX3000M_fit_file.fit ;\
+	$(SYSUPGRADE_TAR_SH) --board cmcc_rax3000m-emmc-ubootmod --kernel RAX3000M_fit_file.fit --rootfs $(RAMDISK) sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin
+	
