@@ -27,7 +27,7 @@ jobs:
       matrix:
         include:
           - build_variant: "QEMU"
-            targets: "QEMU"
+            targets: "QEMU RAX3000M"
 #          - build_variant: "mt7621-usb-1"
 #            targets: "XY-C1 JCG-836PRO JCG-Y2"
 #          - build_variant: "mt7621-usb-2"
