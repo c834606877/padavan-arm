@@ -32,6 +32,7 @@ configure:
 	( cd $(SRC_NAME) ; \
 	PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
 	scanf_cv_type_modifier=no \
+	inherit_rpath=yes \
 	./configure \
 		--prefix=$(STAGEDIR) \
 		--without-tinfo \

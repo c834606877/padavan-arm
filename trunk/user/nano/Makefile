@@ -23,7 +23,7 @@ config_test:
 	fi )
 
 configure:
-	( cd $(SRC_NAME) ; \
+	( cd $(SRC_NAME) ; autoreconf -f -i;\
 	./configure \
 		--prefix=/usr \
 		--enable-tiny \

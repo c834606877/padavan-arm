@@ -212,12 +212,19 @@ endif
 dir_y						+= mtd-utils
 endif
 
-all:
-	for i in $(dir_y) ; do \
-		[ ! -d $$i ] || \
-		$(MAKE) -j1 -C $$i || \
-		exit $$? ; \
-	done
+#all:
+#	for i in $(dir_y) ; do \
+#		[ ! -d $$i ] || \
+#		$(MAKE) -j1 -C $$i || \
+#		exit $$? ; \
+#	done
+#
+all:  $(addprefix comp_,$(dir_y))
+
+comp_%: DIR_NAME=$*
+comp_%:
+	@echo '> compiling for comp_$(DIR_NAME)'
+	$(MAKE) -j1 -C $(DIR_NAME)
 
 %_only:
 	$(MAKE) -C $(@:_only=)

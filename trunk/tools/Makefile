@@ -23,6 +23,7 @@ all:
 	make -C $(SSTRIP_NAME)
 	make -C lzma
 	make -C mksquashfs_xz
+	make -C u-boot
 
 clean:
 	if [ -f $(SSTRIP_NAME)/Makefile ] ; then \
