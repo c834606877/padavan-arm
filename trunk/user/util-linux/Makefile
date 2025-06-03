@@ -29,7 +29,7 @@ config_test:
 	fi )
 
 configure:
-	( cd $(SRC_NAME) ; \
+	( cd $(SRC_NAME) ; autoconfig -f -i;\
 	PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
 	scanf_cv_type_modifier=no \
 	inherit_rpath=yes \
