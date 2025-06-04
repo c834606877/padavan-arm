@@ -12239,7 +12239,7 @@ $as_echo_n "checking whether the $compiler linker ($LD) supports shared librarie
   hardcode_libdir_separator=
   hardcode_minus_L=no
   hardcode_shlibpath_var=unsupported
-  inherit_rpath=no
+  inherit_rpath=yes
   link_all_deplibs=unknown
   module_cmds=
   module_expsym_cmds=
@@ -13215,6 +13215,8 @@ $as_echo "$lt_cv_irix_exported_symbol" >&6; }
       ;;
 
     linux*)
+      inherit_rpath=yes
+      link_all_deplibs=yes
       case $cc_basename in
       tcc*)
 	# Fabrice Bellard et al's Tiny C Compiler
