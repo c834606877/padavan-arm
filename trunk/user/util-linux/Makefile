@@ -30,7 +30,7 @@ config_test:
 
 configure:
 	( cd $(SRC_NAME) ; autoreconf -f -i;\
-	sed -i -e 's/inherit_rpath=no/inherit_rpath=yes/g' configure ;\
+	sed  -e "s/    linux\*)/    linux\*\n      inherit_rpath=yes/g" configure ;\
 	PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
 	scanf_cv_type_modifier=no \
 	inherit_rpath=yes \
