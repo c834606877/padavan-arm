@@ -1,5 +1,6 @@
 #!/bin/bash
 SECONDS=0
+set -x
 
 
 if [ -z "$1" ] || [ "$EUID" != 0 ]; then
@@ -189,8 +190,11 @@ make
 #make rc
 #make srelay
 #make ttyd
-cp linux-5.15.167/arch/arm64/boot/Image.gz ~/workdir/
-cp images/ramdisk ~/workdir/
+
+
+mkdir ~/workdir/
+cp $ROOTDIR/linux-5.15.167/arch/arm64/boot/Image.gz ~/workdir/
+cp $ROOTDIR/images/ramdisk ~/workdir/
 
 duration=$SECONDS
 echo "$((duration / 60)) minutes and $((duration % 60)) seconds elapsed."
