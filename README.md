@@ -66,6 +66,65 @@ ping 10.0.2.2
 __Run on RAX3000M__
 
 
+This part is not completed. check the boot log.
+
+1. Flash the fip with mtk_uartboot
+
+fip and bl2 picked from https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/
+
+You can find the binaries from RAX3000M_flash_bins folder.
+
+```
+./mtk_uartboot -s /dev/<uart_port> --brom-load-baudrate 115200 --bl2-load-baudrate 115200 -p mt7981-ram-ddr4-bl2.bin -a -f mt7981-cmcc_rax3000m-emmc-fip.bin
+
+```
+
+2. Flash the "sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin" to the emmc board through uboot.
+
+__Partion layout with the Rax3000m build__
+
+```
+MT7981> mmc part
+
+Partition Map for MMC device 0  --   Partition Type: EFI
+
+Part	Start LBA	End LBA		Name
+	Attributes
+	Type GUID
+	Partition GUID
+  1	0x00002000	0x000023ff	"u-boot-env"
+	attrs:	0x0000000000000000
+	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
+		(linux)
+	guid:	493dcd1a-59c0-11ee-b4d0-b083fea0360d
+  2	0x00002400	0x000033ff	"factory"
+	attrs:	0x0000000000000000
+	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
+		(linux)
+	guid:	493ddcce-59c0-11ee-b4d0-b083fea0360d
+  3	0x00003400	0x000053ff	"fip"
+	attrs:	0x0000000000000000
+	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
+		(linux)
+	guid:	493de9f8-59c0-11ee-b4d0-b083fea0360d
+  4	0x00016000	0x0001ffff	"config"
+	attrs:	0x0000000000000000
+	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
+		(linux)
+	guid:	493df68c-59c0-11ee-b4d0-b083fea0360d
+  5	0x00020000	0x0003ffff	"kernel"
+	attrs:	0x0000000000000000
+	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
+		(linux)
+	guid:	493e030c-59c0-11ee-b4d0-b083fea0360d
+  6	0x00040000	0x0016bfff	"rootfs"
+	attrs:	0x0000000000000000
+	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
+		(linux)
+	guid:	493e0f82-59c0-11ee-b4d0-b083fea0360d
+
+
+```
 
 
 

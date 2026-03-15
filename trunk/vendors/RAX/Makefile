@@ -137,3 +137,4 @@ endif
 	PATH=$(DTC_DIR):$(PATH) $(UBOOT_MKIMAGE) -f RAX3000M_its_file.its RAX3000M_fit_file.fit ;\
 	$(SYSUPGRADE_TAR_SH) --board cmcc_rax3000m-emmc-ubootmod --kernel RAX3000M_fit_file.fit --rootfs $(RAMDISK) sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin ;\
 	cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin $(IMAGE)
+	mkdir ~/workdir/; cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin ~/workdir/
