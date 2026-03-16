@@ -133,8 +133,8 @@ endif
 	#$(DTC) -I dts -O dtb -o RAX3000M_fit_file.fit  RAX3000M_its_file.its ;
 	cd $(IMAGEDIR); \
 	ENTRY=`LANG=C LC_ALL=C $(ENTRY_CMD)` ; \
-	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o RAX3000M_its_file.its -c config-1 -D cmcc_rax3000m-emmc-ubootmod -d $(ROOTDIR)/kernel_5.15_immortalwrt_dtb.dtb; \
+	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o RAX3000M_its_file.its -c config-1 -D cmcc_rax3000m-emmc-ubootmod -d $(ROOTDIR)/$(LINUXDIR)/arch/arm64/boot/dts/mediatek/mt7981b-cmcc-rax3000m-emmc-ubootmod.dtb; \
 	PATH=$(DTC_DIR):$(PATH) $(UBOOT_MKIMAGE) -f RAX3000M_its_file.its RAX3000M_fit_file.fit ;\
 	$(SYSUPGRADE_TAR_SH) --board cmcc_rax3000m-emmc-ubootmod --kernel RAX3000M_fit_file.fit --rootfs $(RAMDISK) sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin ;\
-	cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin $(IMAGE)
+	cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin $(IMAGE);\
 	mkdir ~/workdir/; cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin ~/workdir/
