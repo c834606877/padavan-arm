@@ -8,7 +8,7 @@
 	compatible = "cmcc,rax3000m-emmc-ubootmod", "mediatek,mt7981";
 
 	chosen {
-		bootargs = "root=PARTLABEL=rootfs rootwait rootfstype=squashfs,f2fs";
+		bootargs = "root=PARTLABEL=rootfs rootwait rootfstype=squashfs,f2fs console=ttyS0,115200n1 earlycon=uart8250,mmio32,0x11002000 clk_ignore_unused loglevel=8";
 	};
 };
 
