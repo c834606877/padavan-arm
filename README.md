@@ -1,26 +1,44 @@
-# padavan-arm
+# Padavan ARM Porting (Kernel 5.15)
 
-This is an ARM based padavan porting version. The original is from https://github.com/hanwckf/padavan-4.4.git
-The kernel version is 5.15.167, which is forked from openwrt 23.05.5 and added MT7981 patchs. 
-Current, only support QEMU for dev.
+This is an **ARM-based** port of the Padavan firmware, specifically optimized for modern hardware and newer kernel features.
 
-__Disabled Path__
+## Project Overview
+- **Upstream Source**: Originally derived and ported from [hanwckf/padavan-4.4](https://github.com).
+- **Kernel Version**: `5.15.167`
+  - Forked from **OpenWrt 23.05.5** stable kernel.
+  - Integrated with **MT7981** specific patches and drivers.
+- **Architecture**: ARM (AArch64).
 
-- mips-toolchain
-- trunk/libc/uclib
-- trunk/linux-4.4.198
+## Supported Platforms
+The project currently supports development and deployment on:
+- [x] **QEMU** (Emulation for development)
+- [x] **RAX3000M** (Physical hardware based on MediaTek MT7981)
 
-__Inctroduced Path__
+## Development Progress (Current Status)
+The project is under active development. Key milestones achieved:
+- [x] **Kernel 5.15.167** bootable on ARM/AArch64.
+- [x] **LAN Side Services**:
+  - `dnsmasq` / **DHCP** server is fully functional.
+  - `httpd` web server is up and running.
+  - **WebUI (WWW)** is accessible and stable.
+- [ ] **WAN Side**: (In Progress / Testing)
+- [ ] **Wi-Fi**: Under integration (MT7981).
+- [!] **Note**: Most unenabled features are currently under discovery and fixing.
 
-- aarch64-gcc-musl
-- trunk/linux-5.15.167
+### Demo for WebUI
 
-__Build__
+![Demo-for-Screenshot](./screenshot-1.gif)
+
+
+
+
+## Getting Started
+### Prerequisites
 
 * Based on ubuntu-20.04, and install below packages.
 * Suggest use Docker with ubuntu-20.04 base.
 
-```
+```bash
 ln -snf /usr/share/zoneinfo/$CONTAINER_TIMEZONE /etc/localtime && echo $CONTAINER_TIMEZONE > /etc/timezone
 
 apt-get update && apt-get install -y texinfo libtool-bin gperf python3-docutils autopoint gettext
@@ -36,6 +54,9 @@ apt-get install -y sudo time git-core subversion build-essential g++ bash make \
 
 ```
 
+### Build Instructions
+
+To build the firmware for a specific target, use the following commands:
 
 ``` bash
 
@@ -45,6 +66,12 @@ fakeroot ./build_firmware_modify RAX3000M
 
 ```
 
+
+
+__Default Access__
+- **Default IP**: `192.168.1.1` (or your configured LAN IP)
+- **Username**: `admin`
+- **Password**: `admin`
 
 __Run on QEMU__
 
@@ -65,12 +92,13 @@ ping 10.0.2.2
 
 __Run on RAX3000M__
 
-
-This part is not completed. check the boot log.
-
 1. Flash the fip with mtk_uartboot
 
-fip and bl2 picked from https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/
+fip and bl2 and other binaries are picked from :
+
+https://www.right.com.cn/forum/thread-8400306-1-1.html
+
+https://downloads.immortalwrt.org/releases/23.05.0/targets/mediatek/filogic/
 
 You can find the binaries from RAX3000M_flash_bins folder.
 
@@ -79,9 +107,13 @@ You can find the binaries from RAX3000M_flash_bins folder.
 
 ```
 
+
 2. Flash the "sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin" to the emmc board through uboot.
 
-__Partion layout with the Rax3000m build__
+
+__Partion layout with this rax3000m build__
+
+https://www.right.com.cn/forum/thread-8400306-1-1.html
 
 ```
 MT7981> mmc part
@@ -122,10 +154,24 @@ Part	Start LBA	End LBA		Name
 	type:	0fc63daf-8483-4772-8e79-3d69d8477de4
 		(linux)
 	guid:	493e0f82-59c0-11ee-b4d0-b083fea0360d
-
-
 ```
 
+__Disabled Path__
+
+- mips-toolchain
+- trunk/libc/uclib
+- trunk/linux-4.4.198
+
+__Inctroduced Path__
+
+- aarch64-gcc-musl
+- trunk/linux-5.15.167
+
+
+*Disclaimer: This is an experimental porting version by Lan Bing. Use at your own risk.*
+
+
+---
 
 
 # padavan-4.4 #

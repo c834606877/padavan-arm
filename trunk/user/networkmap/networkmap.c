@@ -428,7 +428,24 @@ nmap_init(void)
 
 	scan_block = 1;
 
-	if (!ether_atoe(nvram_safe_get("lan_hwaddr"), my_hwaddr))
+	printf("got lan mac addr from nvram:%s\n", nvram_safe_get("lan_hwaddr"));
+	char proc_rand_lan_mac[18] = {0};
+        FILE *fp;
+        fp = fopen("/sys/class/net/"IFNAME_BR"/address", "r");
+        if (fp) {
+                if (fgets(proc_rand_lan_mac, sizeof(proc_rand_lan_mac), fp))
+		{
+			;
+                        //nvram_set("lan_hwaddr", proc_rand_lan_mac);
+		}
+                fclose(fp);
+        }
+	printf("got lan mac addr from sys node :%s\n", proc_rand_lan_mac);
+
+
+	//if (!ether_atoe(nvram_safe_get("lan_hwaddr"), my_hwaddr))
+//		goto error_exit;
+	if (!ether_atoe(proc_rand_lan_mac, my_hwaddr))
 		goto error_exit;
 
 	if (!inet_aton(nvram_safe_get("lan_ipaddr_t"), &my_ipaddr))

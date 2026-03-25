@@ -546,7 +546,55 @@ update_ether_leds(void)
 
 
 void
-init_bridge(int is_ap_mode){}
+init_bridge(int is_ap_mode){
+
+	char *lan_hwaddr = nvram_safe_get("lan_hwaddr");
+	br_add_del_bridge(IFNAME_BR, 1);
+        br_set_stp(IFNAME_BR, 0);
+        br_set_fd(IFNAME_BR, 2);
+        //set_interface_hwaddr(IFNAME_BR, lan_hwaddr);
+	
+	if (!is_ap_mode) {
+                /* add eth2 (or eth2.1) to bridge */
+#if 0
+#if defined (USE_GMAC2_TO_GPHY) || defined (USE_GMAC2_TO_GSW)
+                if (get_wan_bridge_mode() != SWAPI_WAN_BRIDGE_DISABLE) {
+                        create_vlan_iface(IFNAME_MAC, 1, -1, -1, lan_hwaddr, 1);
+                        br_add_del_if(IFNAME_BR, "eth2.1", 1);
+                } else
+#endif
+#endif
+		ifconfig(IFNAME_LAN1, IFUP, NULL, NULL);
+		ifconfig(IFNAME_LAN2, IFUP, NULL, NULL);
+		ifconfig(IFNAME_LAN3, IFUP, NULL, NULL);
+		ifconfig(IFNAME_LAN4, IFUP, NULL, NULL);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN1, 1);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN2, 1);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN3, 1);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN4, 1);
+        } else {
+#if 0
+#if defined (AP_MODE_LAN_TAGGED)
+                /* add eth2 (or eth2.1) to bridge */
+                br_add_del_if(IFNAME_BR, IFNAME_LAN, 1);
+#else
+                /* add only eth2 to bridge */
+                br_add_del_if(IFNAME_BR, IFNAME_MAC, 1);
+#endif
+#if defined (USE_GMAC2_TO_GPHY) || defined (USE_GMAC2_TO_GSW)
+                /* add eth3 to bridge */
+                ifconfig(IFNAME_MAC2, IFUP, NULL, NULL);
+                br_add_del_if(IFNAME_BR, IFNAME_MAC2, 1);
+#if defined (USE_HW_NAT)
+                /* enable PPE to forward bridge traffic */
+                module_smart_load("hw_nat", "ttl_regen=0");
+#endif
+#endif
+#endif
+        }
+
+
+}
 
 
 void

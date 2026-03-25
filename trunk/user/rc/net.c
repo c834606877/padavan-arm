@@ -644,6 +644,10 @@ reload_nat_modules(void)
 		module_smart_unload("nf_nat_ftp", 0);
 		module_smart_unload("nf_conntrack_ftp", 0);
 	}
+	module_smart_load("xt_nat", 0);
+	module_smart_load("xt_MASQUERADE", 0);
+	module_smart_load("xt_REDIRECT", 0);
+	module_smart_load("xt_LOG", 0);
 
 	if ((loaded_ftp != 2) && (needed_ftp0 || needed_ftp1))
 	{

@@ -37,7 +37,7 @@
 #define IFNAME_BR			"br0"
 
 #define IFNAME_MAC			"eth2"
-#define IFNAME_MAC2			"eth3"
+
 #if defined (USE_SINGLE_MAC)
 #define IFNAME_LAN			"eth2.1"
 #define IFNAME_WAN			"eth2.2"
@@ -45,6 +45,17 @@
 #define IFNAME_LAN			IFNAME_MAC
 #define IFNAME_WAN			IFNAME_MAC2
 #endif
+
+//#if defined(BOARD_RAX3000M)||defined(MT7981)
+
+#define IFNAME_LAN1                      "lan1"
+#define IFNAME_LAN2                      "lan2"
+#define IFNAME_LAN3                      "lan3"
+#define IFNAME_LAN4                      "lan4"
+//#endif
+#undef IFNAME_WAN
+#define IFNAME_WAN			"eth1"
+
 
 #define BOARD_2G_AS_WSOC		(BOARD_2G_IN_SOC || !BOARD_5G_IN_SOC)
 
