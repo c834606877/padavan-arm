@@ -36,11 +36,12 @@
 
 #define IFNAME_BR			"br0"
 
-#define IFNAME_MAC			"eth2"
+#define IFNAME_MAC			"eth0"
+#define IFNAME_MAC2			"eth1"
 
 #if defined (USE_SINGLE_MAC)
-#define IFNAME_LAN			"eth2.1"
-#define IFNAME_WAN			"eth2.2"
+#define IFNAME_LAN			"eth1.1"
+#define IFNAME_WAN			"eth1.2"
 #else
 #define IFNAME_LAN			IFNAME_MAC
 #define IFNAME_WAN			IFNAME_MAC2
@@ -53,8 +54,6 @@
 #define IFNAME_LAN3                      "lan3"
 #define IFNAME_LAN4                      "lan4"
 //#endif
-#undef IFNAME_WAN
-#define IFNAME_WAN			"eth1"
 
 
 #define BOARD_2G_AS_WSOC		(BOARD_2G_IN_SOC || !BOARD_5G_IN_SOC)

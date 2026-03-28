@@ -86,6 +86,11 @@ check_header_image(const char *buf, long *file_len)
 	char pid_asus[16];
 	image_header_t *hdr = (image_header_t *)buf;
 
+	if (strncmp(buf,"sysupgrade-cmcc_rax3000m-emmc-ubootmod", strlen("sysupgrade-cmcc_rax3000m-emmc-ubootmod")) == 0) 
+	{
+		return 0;
+	}
+
 	/* check header magic */
 	if (ntohl(hdr->ih_magic) != IH_MAGIC) {
 		httpd_log("%s: Incorrect %s header!", "Firmware update", "image");
@@ -317,7 +322,8 @@ err:
 void
 do_upgrade_fw_post(const char *url, FILE *stream, int clen, char *boundary)
 {
-	const char *upload_file = FW_IMG_NAME;
+	//const char *upload_file = FW_IMG_NAME;
+	const char *upload_file = "/tmp/sysupgrade_cmcc_rax3000m.bin";
 	int ret;
 
 	/* delete some files (need free space in /tmp) */
@@ -332,8 +338,17 @@ do_upgrade_fw_post(const char *url, FILE *stream, int clen, char *boundary)
 	/* reclaim RAM from caches */
 	fput_int("/proc/sys/vm/drop_caches", 1);
 
-	ret = do_upload_file(stream, clen, NULL, upload_file, "file", check_header_image, sizeof(image_header_t));
-	if (ret == 0) {
+	char bndr[128];
+
+	/* the sysupgrade not store file length in the header, check boundary marker */
+	snprintf(bndr, sizeof(bndr), "\r\n--%s", boundary);
+
+	int hrd_size = 	strlen("sysupgrade-cmcc_rax3000m-emmc-ubootmod");
+	if (hrd_size < sizeof(image_header_t))
+		hrd_size = sizeof(image_header_t);
+
+	ret = do_upload_file(stream, clen, bndr, upload_file, "file", check_header_image, hrd_size);
+	if (ret == 0 && 0) {
 		ret = check_crc_image(upload_file);
 		if (ret != 0)
 			unlink(upload_file);

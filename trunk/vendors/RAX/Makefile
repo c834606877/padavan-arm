@@ -45,7 +45,7 @@ ROMFS_DIRS	= \
 	etc_ro \
 	etc_ro/ppp/peers etc_ro/ppp/plugins etc_ro/ppp/3g \
 	etc_ro/Wireless \
-	lib lib/modules \
+	lib lib/modules lib/firmware \
 	mnt \
 	media \
 	opt \
@@ -115,19 +115,40 @@ endif
 
 
 
-image:
-	##############CREATE IMAGE#################
+$(IMAGEDIR)/$(KERNELZ).$(COMP): $(ROOTDIR)/$(LINUXDIR)/vmlinux
 ifeq ($(CONFIG_WITHOUT_KERNEL),y)
 	cd $(IMAGEDIR) ; rm -f $(KERNELZ).*; \
 	cp -f $(MERGE_DIR)/$(CONFIG_FIRMWARE_PRODUCT_ID)/kernel.bin $(KERNELZ).$(COMP)
 else
 	$(CROSS_COMPILE)objcopy -O binary -R .note -R .comment -S $(ROOTDIR)/$(LINUXDIR)/vmlinux $(KERNELZ)
+
+ifeq ($(CONFIG_KERNEL_NO_COMPRESS),y)
+	cd $(IMAGEDIR); rm -f $(KERNELZ).*; mv -f $(KERNELZ) $(KERNELZ).$(COMP)
+else
+	cd $(IMAGEDIR); rm -f $(KERNELZ).*; $(ROOTDIR)/tools/lzma/lzma e -mt8 -lc1 -lp2 -pb2  $(KERNELZ) $(KERNELZ).$(COMP)
+endif
+endif
+
+
+
+image: $(IMAGEDIR)/$(KERNELZ).$(COMP)
+	##############CREATE IMAGE#################
+ifeq (0,1) # moved to above
+
+ifeq ($(CONFIG_WITHOUT_KERNEL),y)
+	cd $(IMAGEDIR) ; rm -f $(KERNELZ).*; \
+	cp -f $(MERGE_DIR)/$(CONFIG_FIRMWARE_PRODUCT_ID)/kernel.bin $(KERNELZ).$(COMP)
+else
+	$(CROSS_COMPILE)objcopy -O binary -R .note -R .comment -S $(ROOTDIR)/$(LINUXDIR)/vmlinux $(KERNELZ)
+
 ifeq ($(CONFIG_KERNEL_NO_COMPRESS),y)
 	cd $(IMAGEDIR); rm -f $(KERNELZ).*; mv -f $(KERNELZ) $(KERNELZ).$(COMP)
 else
 	#cd $(IMAGEDIR); rm -f $(KERNELZ).*; $(ROOTDIR)/tools/lzma/lzma e -a1 -d25 $(KERNELZ) $(KERNELZ).$(COMP)
-	cd $(IMAGEDIR); rm -f $(KERNELZ).*; $(ROOTDIR)/tools/lzma/lzma e -lc1 -lp2 -pb2  $(KERNELZ) $(KERNELZ).$(COMP)
+	cd $(IMAGEDIR); rm -f $(KERNELZ).*; $(ROOTDIR)/tools/lzma/lzma e -mt8 -lc1 -lp2 -pb2  $(KERNELZ) $(KERNELZ).$(COMP)
 endif
+endif
+
 endif
 
 	#$(DTC) -I dts -O dtb -o RAX3000M_fit_file.fit  RAX3000M_its_file.its ;

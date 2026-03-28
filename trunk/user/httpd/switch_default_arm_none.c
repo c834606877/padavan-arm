@@ -129,54 +129,49 @@ int fill_eth_port_status(int port_id_uapi, char linkstate[40])
 	unsigned int link_value = 0;
 	int has_link = 0;
 
-	if (rtl8367_ioctl(RTL8367_IOCTL_STATUS_SPEED_PORT, port_id_uapi, &link_value) < 0) {
-		strcpy(linkstate, "I/O Error");
+	char path_buf[100]={0};
+	char lspeed_buf[100]={0};
+
+	//IFNAME_WAN should be return 0 from nvram_get_int("wan_src_phy");
+	char *p_ifname_list[] = {IFNAME_WAN, IFNAME_LAN1, IFNAME_LAN2, IFNAME_LAN3, IFNAME_LAN4};
+	char *p_ifname = 0;
+	if(port_id_uapi >= 0 && port_id_uapi <= 4){
+		p_ifname = p_ifname_list[port_id_uapi];
+	}else{
+		strcpy(linkstate, "No Link");
+		return 0;
+
+	}
+
+	sprintf(path_buf,"/sys/class/net/%s/speed",p_ifname);
+
+	FILE* fp = fopen(path_buf, "r");
+        if (fp) {
+                if (fgets(lspeed_buf, sizeof(lspeed_buf), fp))
+                {
+			strtok(lspeed_buf, "\n");
+                }
+                fclose(fp);
+        }else{
+		strcpy(linkstate, "No Link");
 		return 0;
 	}
 
-	has_link = (link_value >> 16) & 0x01;
 
-	if (has_link) {
-		int lspeed;
-		const char *text_fc = "";
-		const char *text_dup = "Half Duplex";
-		const char *text_eee = "";
-		
-		switch (link_value & 0x03)
-		{
-		case 2:
-			lspeed = 1000;
-			break;
-		case 1:
-			lspeed = 100;
-			break;
-		default:
-			lspeed = 10;
-			break;
-		}
-		
-		if ((link_value >> 8) & 0x01) {
-			unsigned int link_fc = (link_value >> 9) & 0x03;
-			if (link_fc == 0x03)
-				text_fc = "TX/RX";
-			else if (link_fc == 0x01)
-				text_fc = "TX Asy";
-			else if (link_fc == 0x02)
-				text_fc = "RX Asy";
-			else
-				text_fc = "OFF";
-			text_dup = "Full Duplex, FC ";
-		}
-		
-		if ((link_value >> 11) & 0x03)
-			text_eee = ", EEE";
-		
-		/* 1000 Mbps, Full Duplex, FC TX/RX */
-		sprintf(linkstate, "%d Mbps, %s%s%s", lspeed, text_dup, text_fc, text_eee);
-	} else
-		strcpy(linkstate, "No Link");
+        char duplex_buf[100] = {0};
+	sprintf(path_buf,"/sys/class/net/%s/duplex",p_ifname);
+	fp = fopen(path_buf, "r");
+        if (fp )
+        {
+		fgets(duplex_buf, sizeof(duplex_buf), fp);
+		strtok(duplex_buf, "\n");
 
-	return has_link;
+                fclose(fp);
+	}
+		
+	/* 1000 Mbps, Full Duplex, FC TX/RX */
+	sprintf(linkstate, "%s Mbps, %s", lspeed_buf, duplex_buf);
+	return 1;
 }
 
 int fill_eth_status(int port_id_uapi, webs_t wp)

@@ -8,7 +8,7 @@ LDFLAGS += -Wl,--gc-sections
 
 all: download_test extract_test config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME) && \
-	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
+	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME) install DESTDIR=""
 
 download_test:
 	( if [ ! -f $(SRC_NAME).tar.xz ]; then \

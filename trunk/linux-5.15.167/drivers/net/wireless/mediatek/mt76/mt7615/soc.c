@@ -31,6 +31,7 @@ int mt7622_wmac_init(struct mt7615_dev *dev)
 
 static int mt7622_wmac_probe(struct platform_device *pdev)
 {
+	struct resource *res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	void __iomem *mem_base;
 	int irq;
 
@@ -38,7 +39,7 @@ static int mt7622_wmac_probe(struct platform_device *pdev)
 	if (irq < 0)
 		return irq;
 
-	mem_base = devm_platform_get_and_ioremap_resource(pdev, 0, NULL);
+	mem_base = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(mem_base))
 		return PTR_ERR(mem_base);
 

@@ -305,7 +305,7 @@ bool cfg80211_chandef_valid(const struct cfg80211_chan_def *chandef)
 EXPORT_SYMBOL(cfg80211_chandef_valid);
 
 static void chandef_primary_freqs(const struct cfg80211_chan_def *c,
-				  u32 *pri40, u32 *pri80)
+		u32 *pri40, u32 *pri80)
 {
 	int tmp;
 
@@ -381,9 +381,6 @@ cfg80211_chandef_compatible(const struct cfg80211_chan_def *c1,
 
 	chandef_primary_freqs(c1, &c1_pri40, &c1_pri80);
 	chandef_primary_freqs(c2, &c2_pri40, &c2_pri80);
-
-	if (c1_pri40 != c2_pri40)
-		return NULL;
 
 	WARN_ON(!c1_pri80 && !c2_pri80);
 	if (c1_pri80 && c2_pri80 && c1_pri80 != c2_pri80)
@@ -712,6 +709,19 @@ static bool cfg80211_is_wiphy_oper_chan(struct wiphy *wiphy,
 	return false;
 }
 
+static bool
+cfg80211_offchan_chain_is_active(struct cfg80211_registered_device *rdev,
+				 struct ieee80211_channel *channel)
+{
+	if (!rdev->background_radar_wdev)
+		return false;
+
+	if (!cfg80211_chandef_valid(&rdev->background_radar_chandef))
+		return false;
+
+	return cfg80211_is_sub_chan(&rdev->background_radar_chandef, channel);
+}
+
 bool cfg80211_any_wiphy_oper_chan(struct wiphy *wiphy,
 				  struct ieee80211_channel *chan)
 {
@@ -727,6 +737,9 @@ bool cfg80211_any_wiphy_oper_chan(struct wiphy *wiphy,
 			continue;
 
 		if (cfg80211_is_wiphy_oper_chan(&rdev->wiphy, chan))
+			return true;
+
+		if (cfg80211_offchan_chain_is_active(rdev, chan))
 			return true;
 	}
 

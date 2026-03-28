@@ -105,10 +105,10 @@ mt7615_pm_set(void *data, u64 val)
 	if (!mt7615_firmware_offload(dev) || mt76_is_usb(&dev->mt76))
 		return -EOPNOTSUPP;
 
-	if (val == pm->enable)
-		return 0;
+	mutex_lock(&dev->mt76.mutex);
 
-	mt7615_mutex_acquire(dev);
+	if (val == pm->enable)
+		goto out;
 
 	if (dev->phy.n_beacon_vif) {
 		ret = -EBUSY;
@@ -119,9 +119,16 @@ mt7615_pm_set(void *data, u64 val)
 		pm->stats.last_wake_event = jiffies;
 		pm->stats.last_doze_event = jiffies;
 	}
+	/* make sure the chip is awake here and ps_work is scheduled
+	 * just at end of the this routine.
+	 */
+	pm->enable = false;
+	mt76_connac_pm_wake(&dev->mphy, pm);
+
 	pm->enable = val;
+	mt76_connac_power_save_sched(&dev->mphy, pm);
 out:
-	mt7615_mutex_release(dev);
+	mutex_unlock(&dev->mt76.mutex);
 
 	return ret;
 }
@@ -271,7 +278,6 @@ mt7615_ampdu_stat_read_phy(struct mt7615_phy *phy,
 {
 	struct mt7615_dev *dev = file->private;
 	u32 reg = is_mt7663(&dev->mt76) ? MT_MIB_ARNG(0) : MT_AGG_ASRCR0;
-	bool ext_phy = phy != &dev->phy;
 	int bound[7], i, range;
 
 	if (!phy)
@@ -285,7 +291,7 @@ mt7615_ampdu_stat_read_phy(struct mt7615_phy *phy,
 	for (i = 0; i < 3; i++)
 		bound[i + 4] = MT_AGG_ASRCR_RANGE(range, i) + 1;
 
-	seq_printf(file, "\nPhy %d\n", ext_phy);
+	seq_printf(file, "\nPhy %d\n", phy != &dev->phy);
 
 	seq_printf(file, "Length: %8d | ", bound[0]);
 	for (i = 0; i < ARRAY_SIZE(bound) - 1; i++)
@@ -293,9 +299,8 @@ mt7615_ampdu_stat_read_phy(struct mt7615_phy *phy,
 			   bound[i], bound[i + 1]);
 	seq_puts(file, "\nCount:  ");
 
-	range = ext_phy ? ARRAY_SIZE(dev->mt76.aggr_stats) / 2 : 0;
 	for (i = 0; i < ARRAY_SIZE(bound); i++)
-		seq_printf(file, "%8d | ", dev->mt76.aggr_stats[i + range]);
+		seq_printf(file, "%8d | ", phy->mt76->aggr_stats[i]);
 	seq_puts(file, "\n");
 
 	seq_printf(file, "BA miss count: %d\n", phy->mib.ba_miss_cnt);
@@ -358,6 +363,9 @@ mt7615_queues_acq(struct seq_file *s, void *data)
 		int j, wmm_idx = i % MT7615_MAX_WMM_SETS;
 		int acs = i / MT7615_MAX_WMM_SETS;
 		u32 ctrl, val, qlen = 0;
+
+		if (wmm_idx == 3 && is_mt7663(&dev->mt76))
+			continue;
 
 		val = mt76_rr(dev, MT_PLE_AC_QEMPTY(acs, wmm_idx));
 		ctrl = BIT(31) | BIT(15) | (acs << 8);
@@ -433,10 +441,15 @@ mt7615_ext_mac_addr_read(struct file *file, char __user *userbuf,
 			 size_t count, loff_t *ppos)
 {
 	struct mt7615_dev *dev = file->private_data;
-	char buf[32 * ((ETH_ALEN * 3) + 4) + 1];
+	u32 len = 32 * ((ETH_ALEN * 3) + 4) + 1;
 	u8 addr[ETH_ALEN];
+	char *buf;
 	int ofs = 0;
 	int i;
+
+	buf = kzalloc(len, GFP_KERNEL);
+	if (!buf)
+		return -ENOMEM;
 
 	for (i = 0; i < 32; i++) {
 		if (!(dev->muar_mask & BIT(i)))
@@ -448,10 +461,13 @@ mt7615_ext_mac_addr_read(struct file *file, char __user *userbuf,
 		put_unaligned_le32(mt76_rr(dev, MT_WF_RMAC_MAR0), addr);
 		put_unaligned_le16((mt76_rr(dev, MT_WF_RMAC_MAR1) &
 				    MT_WF_RMAC_MAR1_ADDR), addr + 4);
-		ofs += snprintf(buf + ofs, sizeof(buf) - ofs, "%d=%pM\n", i, addr);
+		ofs += snprintf(buf + ofs, len - ofs, "%d=%pM\n", i, addr);
 	}
 
-	return simple_read_from_buffer(userbuf, count, ppos, buf, ofs);
+	ofs = simple_read_from_buffer(userbuf, count, ppos, buf, ofs);
+
+	kfree(buf);
+	return ofs;
 }
 
 static ssize_t
@@ -533,7 +549,7 @@ int mt7615_init_debugfs(struct mt7615_dev *dev)
 {
 	struct dentry *dir;
 
-	dir = mt76_register_debugfs_fops(&dev->mt76, &fops_regval);
+	dir = mt76_register_debugfs_fops(&dev->mphy, &fops_regval);
 	if (!dir)
 		return -ENOMEM;
 

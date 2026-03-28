@@ -34,11 +34,17 @@
 #endif
 
 /* Default interface if no -I option given */
+#if 0
 #if defined (USE_SINGLE_MAC)
 #define DEFAULT_IF	"eth2.2"
 #else
 #define DEFAULT_IF	"eth3"
 #endif
+#endif
+//#define DEFAULT_IF IFNAME_WAN
+#define DEFAULT_IF "eth1"
+
+
 
 void rp_fatal(char const *str)
 {

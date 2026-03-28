@@ -4,7 +4,8 @@ mount -t proc proc /proc
 mount -t sysfs sysfs /sys
 [ -d /proc/bus/usb ] && mount -t usbfs usbfs /proc/bus/usb
 
-size_tmp="24M"
+#size_tmp="24M"
+size_tmp="48M"
 size_var="4M"
 size_etc="6M"
 
@@ -75,6 +76,9 @@ ln -sf /etc_ro/shells /etc/shells
 ln -sf /etc_ro/profile /etc/profile
 ln -sf /etc_ro/e2fsck.conf /etc/e2fsck.conf
 ln -sf /etc_ro/ipkg.conf /etc/ipkg.conf
+
+
+echo "/lib/firmware/" > /sys/module/firmware_class/parameters/path
 
 # tune linux kernel
 echo 65536        > /proc/sys/fs/file-max

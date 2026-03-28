@@ -212,6 +212,9 @@ endif
 dir_y						+= mtd-utils
 endif
 
+dir_y 						+= wireless-regdb
+dir_y 						+= mt76
+
 #all:
 #	for i in $(dir_y) ; do \
 #		[ ! -d $$i ] || \

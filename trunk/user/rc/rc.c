@@ -90,6 +90,19 @@ nvram_restore_defaults(void)
 		}
 	}
 
+
+	char proc_rand_lan_mac[18] = {0};
+	FILE *fp;
+	fp = fopen("/sys/class/net/eth0/address", "r");
+	if (!fp)
+		fp = fopen("/sys/class/net/eth1/address", "r");
+        if (fp) {
+                if (fgets(proc_rand_lan_mac, sizeof(proc_rand_lan_mac), fp))
+			nvram_set("lan_hwaddr", proc_rand_lan_mac);
+                fclose(fp);
+        }
+
+
 	klogctl(8, NULL, nvram_get_int("console_loglevel"));
 
 	/* load static values */
@@ -674,11 +687,13 @@ init_router(void)
 {
 	int log_remote, is_ap_mode, nvram_need_commit;
 
+#if 0
 #if defined (USE_RTL8367)
 	rtl8367_node();
 #endif
 #if defined (USE_MTK_ESW) || defined (USE_MTK_GSW)
 	mtk_esw_node();
+#endif
 #endif
 
 	nvram_convert_old_params();
@@ -766,6 +781,7 @@ init_router(void)
 		write_storage_to_mtd();
 		restart_crond();
 	}
+
 	// system ready
 	system("/etc/storage/started_script.sh &");
 }

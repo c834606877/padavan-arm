@@ -21,8 +21,11 @@ The project is under active development. Key milestones achieved:
   - `dnsmasq` / **DHCP** server is fully functional.
   - `httpd` web server is up and running.
   - **WebUI (WWW)** is accessible and stable.
-- [ ] **WAN Side**: (In Progress / Testing)
-- [ ] **Wi-Fi**: Under integration (MT7981).
+- [x] **WAN Side**: (udhcpc works for Dyamic IPoE)
+- [x] **Wlan**: (MT7981,MT7915E, kernel driver is ready).
+- [ ] **Wi-Fi UserSpace**: (In Progress).
+- [ ] **NVRAM**: (Currently using RAM).
+- [ ] **Web Upgrade**: (In Progress).
 - [!] **Note**: Most unenabled features are currently under discovery and fixing.
 
 ### Demo for WebUI

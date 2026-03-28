@@ -2892,6 +2892,15 @@ TRACE_EVENT(drv_twt_teardown_request,
 	)
 );
 
+#if LINUX_VERSION_IS_GEQ(5,10,0)
+DEFINE_EVENT(sta_event, drv_net_fill_forward_path,
+	TP_PROTO(struct ieee80211_local *local,
+		 struct ieee80211_sub_if_data *sdata,
+		 struct ieee80211_sta *sta),
+	TP_ARGS(local, sdata, sta)
+);
+#endif
+
 #endif /* !__MAC80211_DRIVER_TRACE || TRACE_HEADER_MULTI_READ */
 
 #undef TRACE_INCLUDE_PATH
