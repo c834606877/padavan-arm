@@ -382,6 +382,8 @@ update_vga_clamp_rt(int first_call)
 void 
 stop_wifi_all_wl(void)
 {
+	eval("/usr/bin/hostapd.sh","stop");
+
 #if BOARD_HAS_5G_RADIO
 	// stop ApCli
 	wif_control(IFNAME_5G_APCLI, 0);
@@ -448,6 +450,9 @@ set_wifi_rssi_threshold(const char* ifname, int is_aband)
 void 
 start_wifi_ap_wl(int radio_on)
 {
+
+        eval("/usr/bin/hostapd.sh","start");
+
 #if BOARD_HAS_5G_RADIO
 	int i_mode_x = get_mode_radio_wl();
 
@@ -740,6 +745,8 @@ reconnect_apcli(const char *ifname_apcli, int force)
 void
 restart_wifi_wl(int radio_on, int need_reload_conf)
 {
+
+	eval("/usr/bin/hostapd.sh","restart");
 #if BOARD_HAS_5G_RADIO
 	stop_8021x_wl();
 

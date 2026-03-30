@@ -214,6 +214,8 @@ endif
 
 dir_y 						+= wireless-regdb
 dir_y 						+= mt76
+dir_y 						+= iw
+dir_y 						+= hostapd
 
 #all:
 #	for i in $(dir_y) ; do \

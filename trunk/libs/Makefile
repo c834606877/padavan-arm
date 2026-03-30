@@ -220,6 +220,8 @@ ifneq (,$(filter y,$(CONFIG_FIRMWARE_INCLUDE_NFSD) $(CONFIG_FIRMWARE_INCLUDE_NFS
 dir_y						+= libtirpc
 endif
 
+dir_y						+= libnl
+
 all:
 	for i in $(dir_y) ; do \
 		[ -d $$i ] && \
@@ -233,6 +235,9 @@ all:
 
 %_only:
 	$(MAKE) -C $(@:_only=)
+
+%_install:
+	$(MAKE) -C $(@:_install=) install
 
 %_romfs:
 	$(MAKE) -C $(@:_romfs=) romfs

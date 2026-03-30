@@ -23,8 +23,15 @@ The project is under active development. Key milestones achieved:
   - **WebUI (WWW)** is accessible and stable.
 - [x] **WAN Side**: (udhcpc works for Dyamic IPoE)
 - [x] **Wlan**: (MT7981,MT7915E, kernel driver is ready).
-- [ ] **Wi-Fi UserSpace**: (In Progress).
-- [ ] **NVRAM**: (Currently using RAM).
+- [ ] **Wi-Fi Tools**: (In Progress).
+  - Modern Tools `iw`, `hostapd`, `libnl-tiny`, `wireless-regdb`
+- [ ] **Wi-Fi**: (In Progress).
+  - [x] `20Mhz` bandwidth
+  - [x] `40Mhz` bandwidth
+  - [ ] `80Mhz` bandwidth
+  - [ ] `160Mhz` bandwidth
+- [x] **Features**: CAKE/QoS with TC.
+- [ ] *NVRAM*: (Currently using RAM).
 - [ ] **Web Upgrade**: (In Progress).
 - [!] **Note**: Most unenabled features are currently under discovery and fixing.
 

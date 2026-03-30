@@ -1,0 +1,159 @@
+name: libnl-tiny
+
+on:
+  pull_request:
+  push:
+
+env:
+  archs: "aarch64 arm mips mips64 powerpc powerpc64 riscv64 x86_64"
+  variants: "build"
+
+jobs:
+  build:
+    name: Build ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            gcc: /usr/bin/aarch64-linux-gnu-gcc
+            packages: gcc-aarch64-linux-gnu
+          - arch: arm
+            gcc: /usr/bin/arm-linux-gnueabi-gcc
+            packages: gcc-arm-linux-gnueabi
+          - arch: mips
+            gcc: /usr/bin/mips-linux-gnu-gcc
+            packages: gcc-mips-linux-gnu
+          - arch: mips64
+            gcc: /usr/bin/mips64-linux-gnuabi64-gcc
+            packages: gcc-mips64-linux-gnuabi64
+          - arch: powerpc
+            gcc: /usr/bin/powerpc-linux-gnu-gcc
+            packages: gcc-powerpc-linux-gnu
+          - arch: powerpc64
+            gcc: /usr/bin/powerpc64-linux-gnu-gcc
+            packages: gcc-powerpc64-linux-gnu
+          - arch: riscv64
+            gcc: /usr/bin/riscv64-linux-gnu-gcc
+            packages: gcc-riscv64-linux-gnu
+          - arch: x86_64
+            gcc: /usr/bin/x86_64-linux-gnu-gcc
+            packages: gcc-x86-64-linux-gnu
+    outputs:
+      size-aarch64-a: ${{ steps.build.outputs.size_aarch64_a }}
+      size-aarch64-so: ${{ steps.build.outputs.size_aarch64_so }}
+      size-arm-a: ${{ steps.build.outputs.size_arm_a }}
+      size-arm-so: ${{ steps.build.outputs.size_arm_so }}
+      size-mips-a: ${{ steps.build.outputs.size_mips_a }}
+      size-mips-so: ${{ steps.build.outputs.size_mips_so }}
+      size-mips64-a: ${{ steps.build.outputs.size_mips64_a }}
+      size-mips64-so: ${{ steps.build.outputs.size_mips64_so }}
+      size-powerpc-a: ${{ steps.build.outputs.size_powerpc_a }}
+      size-powerpc-so: ${{ steps.build.outputs.size_powerpc_so }}
+      size-powerpc64-a: ${{ steps.build.outputs.size_powerpc64_a }}
+      size-powerpc64-so: ${{ steps.build.outputs.size_powerpc64_so }}
+      size-riscv64-a: ${{ steps.build.outputs.size_riscv64_a }}
+      size-riscv64-so: ${{ steps.build.outputs.size_riscv64_so }}
+      size-x86_64-a: ${{ steps.build.outputs.size_x86_64_a }}
+      size-x86_64-so: ${{ steps.build.outputs.size_x86_64_so }}
+    steps:
+      - name: Checkout libnl-tiny
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install ${{ matrix.packages }}
+
+      - name: Prepare build
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/build
+
+      - id: build
+        name: Build libnl-tiny
+        env:
+          BUILD_DIR: build/libnl-tiny
+        run: |
+          cmake \
+            -DCMAKE_C_COMPILER=${{ matrix.gcc }} \
+            -DCMAKE_PREFIX_PATH=${GITHUB_WORKSPACE}/build \
+            --install-prefix ${GITHUB_WORKSPACE}/build \
+            -B $BUILD_DIR -S .
+          make -C $BUILD_DIR
+          make -C $BUILD_DIR install
+          echo "size_${{ matrix.arch }}_a=$( find $BUILD_DIR -type f -name libnl-tiny.a -printf '%s' )" >> $GITHUB_OUTPUT
+          echo "size_${{ matrix.arch }}_so=$( find -L $BUILD_DIR -type f -name libnl-tiny.so -printf '%s' )" >> $GITHUB_OUTPUT
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: libnl-tiny-${{ matrix.arch }}-binaries
+          path: |
+            build/libnl-tiny/libnl-tiny.a
+            build/libnl-tiny/libnl-tiny.so
+          if-no-files-found: error
+
+  summary:
+    name: Sizes
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sizes summary
+        env:
+          size_aarch64_a: ${{needs.build.outputs.size-aarch64-a}}
+          size_aarch64_so: ${{needs.build.outputs.size-aarch64-so}}
+          size_arm_a: ${{needs.build.outputs.size-arm-a}}
+          size_arm_so: ${{needs.build.outputs.size-arm-so}}
+          size_mips_a: ${{needs.build.outputs.size-mips-a}}
+          size_mips_so: ${{needs.build.outputs.size-mips-so}}
+          size_mips64_a: ${{needs.build.outputs.size-mips64-a}}
+          size_mips64_so: ${{needs.build.outputs.size-mips64-so}}
+          size_powerpc_a: ${{needs.build.outputs.size-powerpc-a}}
+          size_powerpc_so: ${{needs.build.outputs.size-powerpc-so}}
+          size_powerpc64_a: ${{needs.build.outputs.size-powerpc64-a}}
+          size_powerpc64_so: ${{needs.build.outputs.size-powerpc64-so}}
+          size_riscv64_a: ${{needs.build.outputs.size-riscv64-a}}
+          size_riscv64_so: ${{needs.build.outputs.size-riscv64-so}}
+          size_x86_64_a: ${{needs.build.outputs.size-x86_64-a}}
+          size_x86_64_so: ${{needs.build.outputs.size-x86_64-so}}
+        run: |
+          echo "### ${GITHUB_WORKFLOW} sizes :floppy_disk:" >> $GITHUB_STEP_SUMMARY
+
+          header="| libnl-tiny.a |"
+          table="| :---: |"
+          for variant in ${{ env.variants }}; do
+            header="$header $variant |"
+            table="$table :---: |"
+          done
+          echo $header >> $GITHUB_STEP_SUMMARY
+          echo $table >> $GITHUB_STEP_SUMMARY
+
+          for arch in ${{ env.archs }}; do
+            row="| $arch | "
+            for variant in $variants; do
+              value=size_${arch}_a
+              row="$row ${!value} |"
+            done
+            echo $row >> $GITHUB_STEP_SUMMARY
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          header="| libnl-tiny.so |"
+          table="| :---: |"
+          for variant in ${{ env.variants }}; do
+            header="$header $variant |"
+            table="$table :---: |"
+          done
+          echo $header >> $GITHUB_STEP_SUMMARY
+          echo $table >> $GITHUB_STEP_SUMMARY
+
+          for arch in ${{ env.archs }}; do
+            row="| $arch | "
+            for variant in $variants; do
+              value=size_${arch}_so
+              row="$row ${!value} |"
+            done
+            echo $row >> $GITHUB_STEP_SUMMARY
+          done

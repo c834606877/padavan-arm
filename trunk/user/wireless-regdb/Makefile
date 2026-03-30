@@ -39,3 +39,4 @@ clean:
 romfs:
 	mkdir -p $(ROMFSDIR)/lib/firmware/
 	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/regulatory.db /lib/firmware/regulatory.db
+	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/regulatory.db.p7s /lib/firmware/regulatory.db.p7s

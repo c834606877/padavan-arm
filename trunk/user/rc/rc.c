@@ -116,6 +116,9 @@ nvram_restore_defaults(void)
 static void
 load_wireless_modules(void)
 {
+//#if defined (USE_MT7981_AP)
+	module_smart_load("mt7915e", NULL);
+//#endif
 #if defined (USE_RT2860V2_AP)
 	module_smart_load("rt2860v2_ap", NULL);
 #endif
