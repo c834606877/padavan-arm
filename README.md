@@ -23,13 +23,12 @@ The project is under active development. Key milestones achieved:
   - **WebUI (WWW)** is accessible and stable.
 - [x] **WAN Side**: (udhcpc works for Dyamic IPoE)
 - [x] **Wlan**: (MT7981,MT7915E, kernel driver is ready).
-- [ ] **Wi-Fi Tools**: (In Progress).
-  - Modern Tools `iw`, `hostapd`, `libnl-tiny`, `wireless-regdb`
-- [ ] **Wi-Fi**: (In Progress).
-  - [x] `20Mhz` bandwidth
-  - [x] `40Mhz` bandwidth
-  - [ ] `80Mhz` bandwidth
-  - [ ] `160Mhz` bandwidth
+- [x] **Wi-Fi Tools**: 
+  - Modern Tools `iw`, `hostapd`, `libnl-tiny`, `wireless-regdb` porting done.
+- [x] **Wi-Fi**: (In Progress).
+  - [x] `2.4Ghz` works.
+  - [x] `5Ghz` works, All bandwidth works `20Mhz` `40Mhz` `80Mhz` `160Mhz`
+  - [ ] `Settings from WebUI is ongoing.`
 - [x] **Features**: CAKE/QoS with TC.
 - [ ] *NVRAM*: (Currently using RAM).
 - [ ] **Web Upgrade**: (In Progress).
@@ -40,6 +39,33 @@ The project is under active development. Key milestones achieved:
 ![Demo-for-Screenshot](./screenshot-1.gif)
 
 
+### Deme for iperf3
+
+Lan PC with Android Mobile through 5Ghz Wifi
+```bash
+Mac-Pro:~ lanbing$ iperf3 -s -p 7799
+-----------------------------------------------------------
+Server listening on 7799 (test #1)
+-----------------------------------------------------------
+Accepted connection from 192.168.1.1, port 45698
+[  5] local 192.168.1.2 port 7799 connected to 192.168.1.1 port 45700
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec  74.4 MBytes   624 Mbits/sec                  
+[  5]   1.00-2.00   sec  80.0 MBytes   671 Mbits/sec                  
+[  5]   2.00-3.00   sec  85.0 MBytes   714 Mbits/sec                  
+[  5]   3.00-4.00   sec  81.1 MBytes   681 Mbits/sec                  
+[  5]   4.00-5.00   sec  88.4 MBytes   741 Mbits/sec                  
+[  5]   5.00-6.00   sec  91.1 MBytes   762 Mbits/sec                  
+[  5]   6.00-7.00   sec   101 MBytes   852 Mbits/sec                  
+[  5]   7.00-8.00   sec   103 MBytes   865 Mbits/sec                  
+[  5]   8.00-9.00   sec  98.6 MBytes   827 Mbits/sec                  
+[  5]   9.00-10.00  sec   102 MBytes   852 Mbits/sec                  
+[  5]  10.00-10.03  sec  3.38 MBytes   833 Mbits/sec                  
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-10.03  sec   908 MBytes   759 Mbits/sec                  receiver
+
+```
 
 
 ## Getting Started
@@ -80,8 +106,9 @@ fakeroot ./build_firmware_modify RAX3000M
 
 __Default Access__
 - **Default IP**: `192.168.1.1` (or your configured LAN IP)
-- **Username**: `admin`
-- **Password**: `admin`
+- **User/Psw**: `admin` / `admin`
+- **Wifi Name**: `MT7981_WiFi6_2.4G`/`MT7981_WiFi6_5G` (DFS with 60sec CAC)
+- **Wifi Psw**: 12345678
 
 __Run on QEMU__
 

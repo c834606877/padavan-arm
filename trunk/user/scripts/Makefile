@@ -27,3 +27,5 @@ endif
 	mkdir -p $(INSTALLDIR)/usr/share/terminfo
 	tar -xzf ./terminfo.tar.gz -C $(INSTALLDIR)/usr/share
 	$(ROMFSINST) /sbin/check_crontab.sh
+	$(ROMFSINST) /etc_ro/hostapd_wlan1.conf
+	$(ROMFSINST) /etc_ro/hostapd.conf

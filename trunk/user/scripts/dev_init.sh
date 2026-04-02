@@ -77,6 +77,9 @@ ln -sf /etc_ro/profile /etc/profile
 ln -sf /etc_ro/e2fsck.conf /etc/e2fsck.conf
 ln -sf /etc_ro/ipkg.conf /etc/ipkg.conf
 
+ln -sf /etc_ro/hostapd.conf /etc/hostapd.conf
+ln -sf /etc_ro/hostapd_wlan1.conf /etc/hostapd_wlan1.conf
+
 
 echo "/lib/firmware/" > /sys/module/firmware_class/parameters/path
 

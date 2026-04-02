@@ -746,7 +746,7 @@ void
 restart_wifi_wl(int radio_on, int need_reload_conf)
 {
 
-	eval("/usr/bin/hostapd.sh","restart");
+	//eval("/usr/bin/hostapd.sh","restart");
 #if BOARD_HAS_5G_RADIO
 	stop_8021x_wl();
 

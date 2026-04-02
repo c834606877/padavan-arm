@@ -1,10 +1,10 @@
 #!/bin/sh
-conf_2.4G=/etc/hostapd.conf
-conf_5G=/etc/hostapd_wlan1.conf
+#conf_2_4G=/etc/hostapd.conf
+#conf_5G=/etc/hostapd_wlan1.conf
 
 func_start(){
-	start-stop-daemon -S -b -x hostapd -- ${conf_2.4G}
-	start-stop-daemon -S -b -x hostapd -- ${conf_5G}
+	start-stop-daemon -S -b -x hostapd -- /etc/hostapd.conf
+	start-stop-daemon -S -b -x hostapd -- /etc/hostapd_wlan1.conf
 }
 
 func_stop(){
