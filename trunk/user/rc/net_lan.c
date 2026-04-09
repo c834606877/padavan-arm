@@ -592,6 +592,8 @@ init_bridge(int is_ap_mode){
 #endif
 #endif
         }
+// Let bridge trafic directly go through without Nat
+	doSystem("echo 0 >/proc/sys/net/bridge/bridge-nf-call-iptables" );
 
 
 }

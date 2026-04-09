@@ -30,7 +30,8 @@ The project is under active development. Key milestones achieved:
   - [x] `5Ghz` works, All bandwidth works `20Mhz` `40Mhz` `80Mhz` `160Mhz`
   - [ ] `Settings from WebUI is ongoing.`
 - [x] **Features**: CAKE/QoS with TC.
-- [ ] *NVRAM*: (Currently using RAM).
+- [x] *NVRAM*: Works.
+- [x] *LED*: Works.
 - [ ] **Web Upgrade**: (In Progress).
 - [!] **Note**: Most unenabled features are currently under discovery and fixing.
 

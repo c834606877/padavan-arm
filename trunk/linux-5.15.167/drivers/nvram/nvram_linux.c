@@ -35,20 +35,49 @@
 
 #define NVRAM_DRIVER_VERSION	"0.08"
 #define PROC_NVRAM_NAME		"nvram"
-#define MTD_NVRAM_NAME		"Config"
+#define MTD_NVRAM_NAME		"config"
 #define NVRAM_VALUES_SPACE	(NVRAM_MTD_SIZE*2)
 
 extern int mt_mtd_read_nm_wifi(char *name, loff_t from, size_t len, u_char *buf);
 extern int mt_mtd_write_nm_wifi(char *name, loff_t to, size_t len, const u_char *buf);
 
+int fake_mt_mtd_read_nm_wifi(char *name, loff_t from, size_t len, u_char *buf);
+int fake_mt_mtd_write_nm_wifi(char *name, loff_t to, size_t len, const u_char *buf);
+
 //#define ra_mtd_read_nm mt_mtd_read_nm_wifi
 //#define ra_mtd_write_nm mt_mtd_write_nm_wifi
 
-#define ra_mtd_read_nm fake_mt_mtd_read_nm_wifi
-#define ra_mtd_write_nm fake_mt_mtd_write_nm_wifi
+//#define ra_mtd_read_nm fake_mt_mtd_read_nm_wifi
+//#define ra_mtd_write_nm fake_mt_mtd_write_nm_wifi
+
+#define ra_mtd_read_nm generic_mtd_read_nm
+#define ra_mtd_write_nm generic_mtd_write_nm
+
+
+static int flag_is_fallback_to_fake_nm = 0;
+
+int generic_mtd_read_nm(char *name, loff_t from, size_t len, u_char *buf){
+	int ret = 0;
+	flag_is_fallback_to_fake_nm = 0;
+	if(flag_is_fallback_to_fake_nm == 1 || (-1 == (ret = mt_mtd_read_nm_wifi(name, from, len, buf))) ){
+		return fake_mt_mtd_read_nm_wifi(name, from, len, buf);
+	}
+
+	return ret;
+}
+
+int generic_mtd_write_nm(char *name, loff_t to, size_t len, const u_char *buf){
+	int ret = 0;
+	flag_is_fallback_to_fake_nm = 0;
+	if(flag_is_fallback_to_fake_nm == 1 || (-1 == (ret = mt_mtd_write_nm_wifi(name, to, len, buf))) ){
+		return fake_mt_mtd_write_nm_wifi(name,to,len,buf);
+	}
+	return ret;
+}
 
 char * fake_mtd_buffer=0;
 int fake_mt_mtd_read_nm_wifi(char *name, loff_t from, size_t len, u_char *buf){
+	printk("fake_mt_mtd_read_nm\n");
 	if (fake_mtd_buffer == 0){
 		fake_mtd_buffer = kmalloc( NVRAM_VALUES_SPACE * 2, GFP_KERNEL);
 	}
@@ -58,6 +87,7 @@ int fake_mt_mtd_read_nm_wifi(char *name, loff_t from, size_t len, u_char *buf){
 	return -1;
 }
 int fake_mt_mtd_write_nm_wifi(char *name, loff_t to, size_t len, const u_char *buf){
+	printk("fake_mt_mtd_write_nm\n");
         if (fake_mtd_buffer == 0){
             fake_mtd_buffer = kmalloc( NVRAM_VALUES_SPACE * 2, GFP_KERNEL);
         }
@@ -66,6 +96,103 @@ int fake_mt_mtd_write_nm_wifi(char *name, loff_t to, size_t len, const u_char *b
         }
         return -1;
 }
+
+
+
+int mt_mtd_read_nm_wifi(char *name, loff_t from, size_t len, u_char *buf)
+{
+	int ret;
+	size_t rdlen;
+	struct mtd_info *mtd;
+
+	mtd = get_mtd_device_nm(name);
+	if (IS_ERR(mtd))
+	{
+		flag_is_fallback_to_fake_nm = 1;
+	printk("mt_mtd_read_nm_wifi_F\n");
+		return -1;
+	}
+	printk("mt_mtd_read_nm_wifi\n");
+
+	ret = mtd_read(mtd, from, len, &rdlen, buf);
+
+	if (rdlen != len)
+			printk("warning: ra_mtd_read_nm: rdlen is not equal to len\n");
+
+	put_mtd_device(mtd);
+
+	return ret;
+}
+EXPORT_SYMBOL(mt_mtd_read_nm_wifi);
+
+int mt_mtd_write_nm_wifi(char *name, loff_t to, size_t len, const u_char *buf)
+{
+	int ret = -1;
+	size_t rdlen, wrlen;
+	struct mtd_info *mtd;
+	struct erase_info ei;
+	u_char *bak = NULL;
+
+	mtd = get_mtd_device_nm(name);
+	if (IS_ERR(mtd))
+	{
+		flag_is_fallback_to_fake_nm = 1;
+	printk("mt_mtd_write_nm_wifi_F\n");
+		return -1;
+	}
+	printk("mt_mtd_write_nm_wifi\n");
+
+
+	if (len > mtd->erasesize) {
+		put_mtd_device(mtd);
+		return -E2BIG;
+	}
+
+	bak = kmalloc(mtd->erasesize, GFP_KERNEL);
+	if (bak == NULL) {
+		put_mtd_device(mtd);
+		return -ENOMEM;
+	}
+
+	ret = mtd_read(mtd, 0, mtd->erasesize, &rdlen, bak);
+
+	if (ret != 0) {
+		put_mtd_device(mtd);
+		kfree(bak);
+		return ret;
+	}
+
+	if (rdlen != mtd->erasesize)
+		printk("warning: ra_mtd_write: rdlen is not equal to erasesize\n");
+
+	memcpy(bak + to, buf, len);
+
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0))
+	ei.mtd = mtd;
+	ei.callback = NULL;
+	ei.priv = 0;
+#endif
+	ei.addr = 0;
+	ei.len = mtd->erasesize;
+	ret = mtd_erase(mtd, &ei);
+
+	if (ret != 0) {
+		put_mtd_device(mtd);
+		kfree(bak);
+		return ret;
+	}
+
+	ret = mtd_write(mtd, 0, mtd->erasesize, &wrlen, bak);
+
+	printk("mt_mtd_write_nm_wifi write done\n");
+
+
+	put_mtd_device(mtd);
+	kfree(bak);
+	return ret;
+}
+EXPORT_SYMBOL(mt_mtd_write_nm_wifi);
+
 
 /* Globals */
 static DEFINE_SPINLOCK(nvram_lock);
@@ -308,6 +435,7 @@ nvram_commit(void)
 	unsigned char *bufw, *bufr;
 	int ret;
 
+	printk("nvram_commit\n");
 	// Check early commit
 	if (nvram_major < 0)
 		return 0;
@@ -679,8 +807,8 @@ dev_nvram_init(void)
 	else if (check_res == -4)
 		istatus = "CRC FAILED!";
 
-	printk("ASUS NVRAM, v%s. Available space: %d. Integrity: %s\n",
-		NVRAM_DRIVER_VERSION, NVRAM_SPACE, istatus);
+	printk("ASUS NVRAM, v%s. Available space: %d. Offset:0x%x Integrity: %s\n",
+		NVRAM_DRIVER_VERSION, NVRAM_SPACE,NVRAM_MTD_OFFSET, istatus);
 
 	return 0;
 

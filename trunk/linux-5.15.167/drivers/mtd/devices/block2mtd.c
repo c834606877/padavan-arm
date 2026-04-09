@@ -214,7 +214,7 @@ static void block2mtd_free_device(struct block2mtd_dev *dev)
 
 
 static struct block2mtd_dev *add_device(char *devname, int erase_size,
-		int timeout)
+		char *mtd_name, int timeout)
 {
 #ifndef MODULE
 	int i;
@@ -278,12 +278,17 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
 
 	/* Setup the MTD structure */
 	/* make the name contain the block device in */
-	name = kasprintf(GFP_KERNEL, "block2mtd: %s", devname);
+
+	if(mtd_name && strlen(mtd_name))
+		name = kasprintf(GFP_KERNEL, "%s", mtd_name);
+	else
+		name = kasprintf(GFP_KERNEL, "block2mtd: %s", devname);
+
+
 	if (!name)
 		goto err_destroy_mutex;
 
 	dev->mtd.name = name;
-
 	dev->mtd.size = dev->blkdev->bd_inode->i_size & PAGE_MASK;
 	dev->mtd.erasesize = erase_size;
 	dev->mtd.writesize = 1;
@@ -305,7 +310,7 @@ static struct block2mtd_dev *add_device(char *devname, int erase_size,
 	list_add(&dev->list, &blkmtd_device_list);
 	pr_info("mtd%d: [%s] erase_size = %dKiB [%d]\n",
 		dev->mtd.index,
-		dev->mtd.name + strlen("block2mtd: "),
+		dev->mtd.name /*+ strlen("block2mtd: ")*/,
 		dev->mtd.erasesize >> 10, dev->mtd.erasesize);
 	return dev;
 
@@ -381,8 +386,9 @@ static int block2mtd_setup2(const char *val)
 	/* 80 for device, 12 for erase size, 80 for name, 8 for timeout */
 	char buf[80 + 12 + 80 + 8];
 	char *str = buf;
-	char *token[2];
+	char *token[3]={0};
 	char *name;
+	char *mtd_name;
 	size_t erase_size = PAGE_SIZE;
 	unsigned long timeout = MTD_DEFAULT_TIMEOUT;
 	int i, ret;
@@ -395,10 +401,10 @@ static int block2mtd_setup2(const char *val)
 	strcpy(str, val);
 	kill_final_newline(str);
 
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < 3 && str; i++)
 		token[i] = strsep(&str, ",");
 
-	if (str) {
+	if (str || i>3) {
 		pr_err("too many arguments\n");
 		return 0;
 	}
@@ -421,8 +427,10 @@ static int block2mtd_setup2(const char *val)
 			return 0;
 		}
 	}
+	
+	mtd_name = token[2];
 
-	add_device(name, erase_size, timeout);
+	add_device(name, erase_size,mtd_name, timeout);
 
 	return 0;
 }

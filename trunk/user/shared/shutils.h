@@ -132,6 +132,9 @@ extern char *get_param_str(char *line, const char *param, int dups);
 extern int fput_string(const char *name, const char *value);
 extern int fput_int(const char *name, int value);
 
+extern int fget_string(const char *name, char *value, int size);
+extern int fget_int(const char *name, int *value);
+
 extern int compare_text_files(const char* file1, const char* file2);
 
 extern void logmessage(char *logheader, char *fmt, ...);

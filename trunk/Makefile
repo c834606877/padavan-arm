@@ -75,8 +75,8 @@ ifneq ($(SUBARCH),)
 MAKEARCH = $(MAKE) ARCH=$(SUBARCH) CROSS_COMPILE=$(CROSS_COMPILE)
 MAKEARCH_KERNEL = $(MAKE) ARCH=$(ARCH) SUBARCH=$(SUBARCH) CROSS_COMPILE=$(KERNEL_CROSS_COMPILE)
 else
-MAKEARCH = $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE)
-MAKEARCH_KERNEL = $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(KERNEL_CROSS_COMPILE)
+MAKEARCH = $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(CROSS_COMPILE) -j$(HOST_NCPU)
+MAKEARCH_KERNEL = $(MAKE) ARCH=$(ARCH) CROSS_COMPILE=$(KERNEL_CROSS_COMPILE) -j$(HOST_NCPU)
 endif
 DIRS = libc libs user
 
@@ -217,6 +217,15 @@ clean:
 	     $(MAKEARCH) -C $$d $$t;; \
 	*)   $(MAKEARCH) -C $(@:_romfs=) romfs;; \
 	esac
+
+%_install:
+	@case "$(@)" in \
+	*/*) d=`expr $(@) : '\([^/]*\)/.*'`; \
+	     t=`expr $(@) : '[^/]*/\(.*\)'`; \
+	     $(MAKEARCH) -C $$d $$t;; \
+	*)   $(MAKEARCH) -C $(@:_install=) install;; \
+	esac
+
 
 %_only:
 	@case "$(@)" in \

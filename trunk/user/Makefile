@@ -94,6 +94,9 @@ dir_y =
 dir_n =
 dir_  =
 
+dir_y						+= shared
+dir_$(STORAGE_ENABLED)				+= libdisk
+
 dir_y						+= busybox
 dir_y						+= iptables
 dir_y						+= coremark
@@ -104,8 +107,6 @@ dir_y						+= poptop
 dir_y						+= ebtables
 dir_y						+= iproute2
 dir_y						+= wireless_tools
-dir_y						+= shared
-dir_$(STORAGE_ENABLED)				+= libdisk
 dir_y						+= nvram
 dir_y						+= mtd_write
 dir_y						+= networkmap
@@ -226,10 +227,13 @@ dir_y 						+= hostapd
 #
 all:  $(addprefix comp_,$(dir_y))
 
+comp_libdisk: comp_shared
+comp_rc: comp_shared comp_iw
+
 comp_%: DIR_NAME=$*
 comp_%:
 	@echo '> compiling for comp_$(DIR_NAME)'
-	$(MAKE) -j1 -C $(DIR_NAME)
+	$(MAKE) -j$(HOST_NCPU) -C $(DIR_NAME)
 
 %_only:
 	$(MAKE) -C $(@:_only=)

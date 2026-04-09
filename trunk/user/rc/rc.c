@@ -699,6 +699,14 @@ init_router(void)
 #endif
 #endif
 
+//	echo -n "/dev/mmcblk0p4,256KiB,config" > /sys/module/block2mtd/parameters/block2mtd
+char * bl2mtd_para = "/sys/module/block2mtd/parameters/block2mtd";
+char * bl2mtd_value = "/dev/mmcblk0p4,256KiB,config";
+
+fput_string(bl2mtd_para,bl2mtd_value);
+
+	module_smart_load("nvram_linux",NULL);
+
 	nvram_convert_old_params();
 
 	nvram_need_commit = nvram_restore_defaults();

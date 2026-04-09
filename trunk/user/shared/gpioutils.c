@@ -7,7 +7,8 @@ const char* led_to_name(int led)
 	switch (led)
 	{
 		case LED_PWR:
-			return "power";
+			return "blue:status";
+			//"power";
 		case LED_WIFI:
 			return "wifi";
 		case LED_SW2G:
@@ -15,7 +16,8 @@ const char* led_to_name(int led)
 		case LED_SW5G:
 			return "sw5g";
 		case LED_WAN:
-			return "wan";
+			return "green:status";
+			//"wan";
 		case LED_LAN:
 			return "lan";
 		case LED_USB:
@@ -34,7 +36,7 @@ int
 search_gpio_led(void)
 {
 	static int leds = -1;
-	const char* leds_dir = "/sys/devices/platform/leds/leds";
+	const char* leds_dir = "/sys/devices/platform/gpio-leds/leds";
 	DIR *dp;
 	struct dirent *dirp;
 
@@ -47,7 +49,7 @@ search_gpio_led(void)
 		while ((dirp = readdir(dp)) != NULL)
 		{
 			if (dirp->d_type == DT_DIR) {
-				if (!strcmp(dirp->d_name, "power")) {
+				if (!strcmp(dirp->d_name, "power") || !strcmp(dirp->d_name, "blue:status") ) {
 					leds |= LED_PWR;
 				} else if (!strcmp(dirp->d_name, "wifi")) {
 					leds |= LED_WIFI;
@@ -55,7 +57,7 @@ search_gpio_led(void)
 					leds |= LED_SW2G;
 				} else if (!strcmp(dirp->d_name, "sw5g")) {
 					leds |= LED_SW5G;
-				} else if (!strcmp(dirp->d_name, "wan")) {
+				} else if (!strcmp(dirp->d_name, "wan") || !strcmp(dirp->d_name, "green:status") ) {
 					leds |= LED_WAN;
 				} else if (!strcmp(dirp->d_name, "lan")) {
 					leds |= LED_LAN;

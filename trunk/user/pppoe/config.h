@@ -79,7 +79,7 @@
 #define HAVE_NET_IF_ARP_H 1
 
 /* Define if you have the <net/ethernet.h> header file.  */
-#define HAVE_NET_ETHERNET_H 1
+//#define HAVE_NET_ETHERNET_H 1
 
 /* Define if you have the <net/if.h> header file.  */
 #define HAVE_NET_IF_H 1
@@ -97,7 +97,7 @@
 /* #undef HAVE_NET_IF_TYPES_H */
 
 /* Define if you have the <netinet/if_ether.h> header file.  */
-#define HAVE_NETINET_IF_ETHER_H 1
+//#define HAVE_NETINET_IF_ETHER_H 1
 
 /* Define if you have the <netpacket/packet.h> header file.  */
 #define HAVE_NETPACKET_PACKET_H 1

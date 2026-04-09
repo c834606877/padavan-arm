@@ -592,6 +592,37 @@ fput_int(const char *name, int value)
 	return fput_string(name, svalue);
 }
 
+int
+fget_string(const char *name, char *value, int size)
+{
+        FILE *fp;
+
+        fp = fopen(name, "r");
+        if (fp) {
+                fgets(value, size, fp);
+                fclose(fp);
+                return 0;
+        } else {
+                perror(name);
+                return errno;
+        }
+}
+
+int
+fget_int(const char *name, int *value)
+{
+	char svalue[256]={0};
+        int ret = fget_string(name,svalue,sizeof(svalue));
+	if(ret == 0){
+		if(value)
+		{
+			*value = atoi(svalue);
+		}
+	}
+	return ret;
+}
+
+
 int 
 compare_text_files(const char* file1, const char* file2)
 {
