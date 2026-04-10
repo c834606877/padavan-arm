@@ -13,7 +13,13 @@ service_headers = $(service_sources:.c=.h)
 SOURCES += $(service_sources)
 OBJS=$(SOURCES:.c=.o)
 
-all: lubox gen-errors gen-headers $(TARGET)
+#all: lubox gen-errors gen-headers $(TARGET)
+all:
+	$(MAKE) lubox -j
+	$(MAKE) gen-errors -j
+	$(MAKE) gen-headers -j
+	$(MAKE) $(TARGET) -j
+
 
 gen-errors: qmi-errors.c
 

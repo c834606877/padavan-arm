@@ -2,11 +2,11 @@
 .PHONY: all romfs clean
 
 ifndef ROOTDIR
-ROOTDIR=..
+ROOTDIR:=$(shell pwd)
 endif
 
 ifndef ROMFSDIR
-ROMFSDIR=$(ROOTDIR)/romfs
+ROMFSDIR:=$(ROOTDIR)/romfs
 endif
 
 UCLINUX_BUILD_USER=1
@@ -227,13 +227,42 @@ dir_y 						+= hostapd
 #
 all:  $(addprefix comp_,$(dir_y))
 
+PRIORITY_DIRS = shared libdisk wireless_tools iptables
+NORMAL_DIRS = $(filter-out $(PRIORITY_DIRS), $(dir_y))
+
+PRIORITY_TARGETS = $(addprefix comp_,$(PRIORITY_DIRS))
+NORMAL_TARGETS   = $(addprefix comp_,$(NORMAL_DIRS))
+
+$(NORMAL_TARGETS): $(PRIORITY_TARGETS)
+
+#comp_miniupnpd: comp_iptables
 comp_libdisk: comp_shared
-comp_rc: comp_shared comp_iw
+
+ORIGIN_CFLAGS := $(CFLAGS)
+ORIGIN_CPPFLAGS := $(CPPFLAGS)
+ORIGIN_LDFLAGS := $(LDFLAGS)
+ORIGIN_CXXFLAGS := $(CXXFLAGS)
+comp_%: unexport CFLAGS CPPFLAGS LDFLAGS CXXFLAGS
+
 
 comp_%: DIR_NAME=$*
 comp_%:
 	@echo '> compiling for comp_$(DIR_NAME)'
-	$(MAKE) -j$(HOST_NCPU) -C $(DIR_NAME)
+	$(MAKE) -n -C $(DIR_NAME) download_test >/dev/null 2>&1; \
+	if [ $$? -ne 2 ]; then \
+		$(MAKE) -C $(DIR_NAME) download_test; \
+	fi && \
+	$(MAKE) -n -C $(DIR_NAME) extract_test >/dev/null 2>&1; \
+	if [ $$? -ne 2 ]; then \
+		$(MAKE) -C $(DIR_NAME) extract_test; \
+	fi && \
+	$(MAKE) -n -C $(DIR_NAME) config_test >/dev/null 2>&1; \
+	if [ $$? -ne 2 ]; then \
+		CFLAGS="$(ORIGIN_CFLAGS)" CPPFLAGS="$(ORIGIN_CPPFLAGS)" LDFLAGS="$(ORIGIN_LDFLAGS)" CXXFLAGS="$(ORIGIN_CXXFLAGS)" \
+		$(MAKE) -C $(DIR_NAME) config_test; \
+	fi && \
+	CFLAGS="$(ORIGIN_CFLAGS)" CPPFLAGS="$(ORIGIN_CPPFLAGS)" LDFLAGS="$(ORIGIN_LDFLAGS)" CXXFLAGS="$(ORIGIN_CXXFLAGS)" \
+	$(MAKE) -C $(DIR_NAME) 
 
 %_only:
 	$(MAKE) -C $(@:_only=)
@@ -252,6 +281,7 @@ romfs:
 
 clean:
 	for i in `ls -d *` ; do \
+		echo "Clean $$i"; \
 		[ ! -d $$i ] || \
-		$(MAKE) -C $$i clean ; \
+		$(MAKE) --ignore-errors -C $$i clean  ; \
 	done

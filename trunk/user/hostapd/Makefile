@@ -20,43 +20,14 @@ download_test:
 extract_test:
 	( if [ ! -d hostapd-$(SRC_VER) ]; then \
 		tar xzf hostapd-$(SRC_VER).tar.gz; \
-		#patch -d $(SRC_NAME) -p1 -i ../openssh-orig.patch; \
 	fi )
 
-config_test:
-	( if [ -f ./config_done ]; then \
-		echo "the same configuration"; \
-	else \
-		make configure && touch config_done; \
-	fi )
-
-configure:
-	( cd $(SRC_NAME) ; \
-	autoreconf -v; \
-	LD="$(CC)" \
-	./configure \
-		--prefix=/usr \
-		--sysconfdir=/etc/storage/openssh \
-		--libexecdir=/usr/libexec \
-		--with-pid-dir=/var/run \
-		--with-privsep-path=/var/empty \
-		--with-privsep-user=sshd \
-		--with-sandbox=no \
-		--without-pam \
-		--without-selinux \
-		--without-bsd-auth \
-		--without-kerberos5 \
-		--disable-strip \
-		--disable-etc-default-login \
-		--disable-lastlog \
-		--disable-utmp \
-		--disable-utmpx \
-		--disable-wtmp \
-		--disable-wtmpx \
-		--disable-libutil \
-		--host=$(HOST_TARGET) \
-		--build=$(HOST_BUILD) ; \
-	)
+#config_test:
+#	( if [ -f ./config_done ]; then \
+#		echo "the same configuration"; \
+#	else \
+#		make configure && touch config_done; \
+#	fi )
 
 clean:
 	if [ -f $(SRC_NAME)/Makefile ] ; then \
