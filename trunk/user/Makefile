@@ -2,7 +2,7 @@
 .PHONY: all romfs clean
 
 ifndef ROOTDIR
-ROOTDIR:=$(shell pwd)
+ROOTDIR:=$(CURR_DIR)/../
 endif
 
 ifndef ROMFSDIR
@@ -217,6 +217,7 @@ dir_y 						+= wireless-regdb
 dir_y 						+= mt76
 dir_y 						+= iw
 dir_y 						+= hostapd
+dir_y 						+= nftables
 
 #all:
 #	for i in $(dir_y) ; do \

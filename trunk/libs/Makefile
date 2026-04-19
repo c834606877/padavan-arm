@@ -221,6 +221,7 @@ dir_y						+= libtirpc
 endif
 
 dir_y						+= libnl
+dir_y						+= libnftnl
 
 all:
 	for i in $(dir_y) ; do \

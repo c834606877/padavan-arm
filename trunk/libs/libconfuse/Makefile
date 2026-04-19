@@ -23,6 +23,7 @@ config_test:
 
 configure:
 	( cd $(SRC_NAME) ; \
+	autoreconfig -f -i; \
 	./configure \
 		--disable-examples \
 		--enable-static \

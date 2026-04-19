@@ -1,0 +1,28 @@
+table ip filter1 {
+	flowtable Main_ft1 {
+		hook ingress priority filter
+		devices = { "lo" }
+		counter
+	}
+}
+table ip filter2 {
+	flowtable Main_ft2 {
+		hook ingress priority filter
+		devices = { "lo" }
+		counter
+	}
+}
+table ip filter3 {
+	flowtable Main_ft3 {
+		hook ingress priority filter
+		devices = { "lo" }
+		counter
+	}
+}
+table ip filter4 {
+	flowtable Main_ft4 {
+		hook ingress priority filter
+		devices = { "lo" }
+		counter
+	}
+}

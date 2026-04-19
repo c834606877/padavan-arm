@@ -18,12 +18,11 @@ config_test:
 configure:
 	( cd $(SRC_NAME) ; \
 	./autogen.sh ; \
+	PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
 	./configure \
 		--prefix= \
 		--enable-static \
 		--disable-shared \
-		--disable-nftables \
-		--disable-connlabel \
 		--with-xtlibdir=/usr/lib/xtables \
 		--with-kernel=$(ROOTDIR)/$(LINUXDIR) \
 		--with-xt-lock-name="/var/lock/xtables.lock" \
@@ -40,7 +39,8 @@ clean:
 
 romfs:
 	mkdir -p $(ROMFSDIR)/usr/lib/xtables
-	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/iptables/xtables-legacy-multi /bin/xtables-multi
+	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/iptables/xtables-legacy-multi /bin/xtables-legacy-multi
+	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/iptables/xtables-nft-multi /bin/xtables-multi
 	$(ROMFSINST) -s xtables-multi /bin/iptables
 	$(ROMFSINST) -s xtables-multi /bin/iptables-restore
 	$(ROMFSINST) -s xtables-multi /bin/iptables-save
