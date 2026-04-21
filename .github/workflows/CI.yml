@@ -80,3 +80,9 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true
+      - name: Upload Logs on Failure
+        if: failure()  # Only runs if a previous step failed
+        uses: actions/upload-artifact@v4
+        with:
+          name: failure-logs
+          path: ${{ github.workspace }}/trunk/build.log
