@@ -724,6 +724,10 @@ fput_string(bl2mtd_para,bl2mtd_value);
 
 	gen_ralink_config_2g(0);
 	gen_ralink_config_5g(0);
+
+	module_smart_load("ppp_generic",NULL);
+	module_smart_load("pppoe",NULL);
+
 	load_wireless_modules();
 #if defined (USE_MMC_SUPPORT)
 	load_mmc_modules();

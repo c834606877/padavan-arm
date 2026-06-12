@@ -21,18 +21,20 @@ The project is under active development. Key milestones achieved:
   - `dnsmasq` / **DHCP** server is fully functional.
   - `httpd` web server is up and running.
   - **WebUI (WWW)** is accessible and stable.
-- [x] **WAN Side**: (udhcpc works for Dyamic IPoE)
+- [x] **WAN Side**: (udhcpc works for Dyamic IPoE and PPPoE)
 - [x] **Wlan**: (MT7981,MT7915E, kernel driver is ready).
 - [x] **Wi-Fi Tools**: 
   - Modern Tools `iw`, `hostapd`, `libnl-tiny`, `wireless-regdb` porting done.
 - [x] **Wi-Fi**: (In Progress).
   - [x] `2.4Ghz` works.
   - [x] `5Ghz` works, All bandwidth works `20Mhz` `40Mhz` `80Mhz` `160Mhz`
-  - [ ] `Settings from WebUI is ongoing.`
+  - [x] User/Psw  Settings is works.
+  - [ ] `Other Settings from WebUI is ongoing.`
 - [x] **Features**: CAKE/QoS with TC.
 - [x] *NVRAM*: Works.
 - [x] *LED*: Works.
 - [ ] **Web Upgrade**: (In Progress).
+  - It means you must update the firmware from uboot for currently.
 - [!] **Note**: Most unenabled features are currently under discovery and fixing.
 
 ### Demo for WebUI
@@ -108,8 +110,8 @@ fakeroot ./build_firmware_modify RAX3000M
 __Default Access__
 - **Default IP**: `192.168.1.1` (or your configured LAN IP)
 - **User/Psw**: `admin` / `admin`
-- **Wifi Name**: `MT7981_WiFi6_2.4G`/`MT7981_WiFi6_5G` (DFS with 60sec CAC)
-- **Wifi Psw**: 12345678
+- **Wifi Name**: `RAX3000M_FFFF`/`RAX3000M_FFFF_5G` (DFS with 60sec CAC)
+- **Wifi Psw**: 1234567890
 
 __Run on QEMU__
 
