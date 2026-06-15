@@ -63,6 +63,11 @@ endif # CONFIG_RT_SECOND_CARD
 endif # CONFIG_DBDC_MODE
 endif # CONFIG_FIRST_IF_NONE
 
+ifeq ($(CONFIG_PRODUCT),MT7981)
+CFLAGS += -DUSE_WID_2G=7981
+CFLAGS += -DUSE_WID_5G=7981
+endif
+
 ##################################################################
 # Project .config related params
 ##################################################################

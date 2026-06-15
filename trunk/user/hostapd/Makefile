@@ -38,6 +38,8 @@ clean:
 romfs:
 	#mkdir -p $(INSTALLDIR)/usr/libexec
 	$(ROMFSINST) -p +x $(THISDIR)/$(SRC_NAME)/hostapd /usr/sbin/hostapd
+	$(ROMFSINST) -p +x $(THISDIR)/$(SRC_NAME)/hostapd_cli /usr/sbin/hostapd_cli
 	#$(ROMFSINST) $(THISDIR)/hostapd.conf /etc/hostapd.conf
 	#$(ROMFSINST) $(THISDIR)/hostapd_wlan1.conf /etc/hostapd_wlan1.conf
 	$(ROMFSINST) -p +x $(THISDIR)/hostapd.sh /usr/bin/hostapd.sh
+	$(ROMFSINST) -p +x $(THISDIR)/hostapd_genconf.sh /usr/bin/hostapd_genconf.sh

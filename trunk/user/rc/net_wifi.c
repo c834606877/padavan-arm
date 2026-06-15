@@ -382,7 +382,7 @@ update_vga_clamp_rt(int first_call)
 void 
 stop_wifi_all_wl(void)
 {
-	eval("/usr/bin/hostapd.sh","stop");
+	eval("/usr/bin/hostapd.sh","stop_wl");
 
 #if BOARD_HAS_5G_RADIO
 	// stop ApCli
@@ -405,6 +405,7 @@ stop_wifi_all_wl(void)
 void 
 stop_wifi_all_rt(void)
 {
+	eval("/usr/bin/hostapd.sh","stop_rt");
 #if defined(USE_RT3352_MII)
 	stop_inicd();
 	
@@ -451,7 +452,7 @@ void
 start_wifi_ap_wl(int radio_on)
 {
 
-        eval("/usr/bin/hostapd.sh","start");
+        eval("/usr/bin/hostapd.sh","start_wl");
 
 #if BOARD_HAS_5G_RADIO
 	int i_mode_x = get_mode_radio_wl();
@@ -487,6 +488,7 @@ start_wifi_ap_wl(int radio_on)
 void 
 start_wifi_ap_rt(int radio_on)
 {
+        eval("/usr/bin/hostapd.sh","start_rt");
 	int i_mode_x = get_mode_radio_rt();
 #if defined(USE_RT3352_MII)
 	int is_ap_mode = get_ap_mode();

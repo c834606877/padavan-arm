@@ -2335,15 +2335,17 @@ ej_firmware_caps_hook(int eid, webs_t wp, int argc, char **argv)
 	int has_switch_type = -1;
 #endif
 	int has_btn_mode = 0;
-#if defined (USE_WID_5G) && (USE_WID_5G==7610 || USE_WID_5G==7612 || USE_WID_5G==7615 || USE_WID_5G==7915)
+#if defined (USE_WID_5G) && (USE_WID_5G==7610 || USE_WID_5G==7612 || USE_WID_5G==7615 || USE_WID_5G==7915 || USE_WID_5G==7981)
 	int has_5g_vht = 1;
 #else
 	int has_5g_vht = 0;
 #endif
-#if defined (USE_WID_5G) && (USE_WID_5G==7615 || USE_WID_5G==7915)
+#if defined (USE_WID_5G) && (USE_WID_5G==7615 || USE_WID_5G==7915 || USE_WID_5G==7981)
 	int has_5g_mumimo = 1;
 	int has_5g_txbf = 1;
-#if defined (BOARD_MT7615_DBDC) || defined (BOARD_MT7915_DBDC)
+#if USE_WID_5G==7981
+	int has_5g_160mhz = 1;
+#elif defined (BOARD_MT7615_DBDC) || defined (BOARD_MT7915_DBDC)
 	int has_5g_160mhz = 0;
 #else
 	int has_5g_160mhz = 1;
@@ -2353,7 +2355,7 @@ ej_firmware_caps_hook(int eid, webs_t wp, int argc, char **argv)
 	int has_5g_txbf = 0;
 	int has_5g_160mhz = 0;
 #endif
-#if defined (USE_WID_2G) && (USE_WID_2G==7615 || USE_WID_2G==7915)
+#if defined (USE_WID_2G) && (USE_WID_2G==7615 || USE_WID_2G==7915 || USE_WID_2G==7981)
 	int has_2g_turbo_qam = 1;
 #else
 	int has_2g_turbo_qam = 0;
@@ -2378,12 +2380,12 @@ ej_firmware_caps_hook(int eid, webs_t wp, int argc, char **argv)
 #else
 	int has_lan_ap_isolate = 1;
 #endif
-#if defined (USE_WID_5G) && (USE_WID_5G==7915)
+#if defined (USE_WID_5G) && (USE_WID_5G==7915 || USE_WID_5G==7981)
 	int has_5g_11ax = 1;
 #else
 	int has_5g_11ax = 0;
 #endif
-#if defined (USE_WID_2G) && (USE_WID_2G==7915)
+#if defined (USE_WID_2G) && (USE_WID_2G==7915 || USE_WID_2G==7981)
 	int has_2g_11ax = 1;
 #else
 	int has_2g_11ax = 0;

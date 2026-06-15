@@ -15,25 +15,34 @@ rt_ssid_temp="MT7981_WiFi6_2.4G"
 wl_ssid_temp="MT7981_WiFi6_5G"
 psd_tmp="12345678"
 
+bash /usr/bin/hostapd_genconf.sh
 
-func_start(){
+func_start_wl(){
 
 	sed "s/ssid=${rt_ssid_temp}/ssid=${rt_ssid}/g" /etc/hostapd.conf > /etc/hostapd_wlan0_cur.conf
 	sed "s/wpa_passphrase=${psd_tmp}/wpa_passphrase=${rt_psd}/g" -i /etc/hostapd_wlan0_cur.conf 
 
+
+	#start-stop-daemon -S -b -m -p /var/run/hostapd.wlan1.pid -x /usr/sbin/hostapd -- /etc/hostapd_wlan1_cur.conf
+	start-stop-daemon -S -b -m -p /var/run/hostapd.wlan1.pid -x /usr/sbin/hostapd -- /var/run/hostapd/hostapd-wlan1.conf
+}
+func_start_rt(){
 	sed "s/ssid=${wl_ssid_temp}/ssid=${wl_ssid}/g" /etc/hostapd_wlan1.conf > /etc/hostapd_wlan1_cur.conf
 	sed "s/wpa_passphrase=${psd_tmp}/wpa_passphrase=${wl_psd}/g" -i /etc/hostapd_wlan1_cur.conf 
 
-
-	start-stop-daemon -S -b -m -p /var/run/hostapd.wlan0.pid -x /usr/sbin/hostapd -- /etc/hostapd_wlan0_cur.conf
-	start-stop-daemon -S -b -m -p /var/run/hostapd.wlan1.pid -x /usr/sbin/hostapd -- /etc/hostapd_wlan1_cur.conf
+	#start-stop-daemon -S -b -m -p /var/run/hostapd.wlan0.pid -x /usr/sbin/hostapd -- /etc/hostapd_wlan0_cur.conf
+	start-stop-daemon -S -b -m -p /var/run/hostapd.wlan0.pid -x /usr/sbin/hostapd -- /var/run/hostapd/hostapd-wlan0.conf
 }
 
-func_stop(){
+func_stop_rt(){
 
         start-stop-daemon -K \
              -p /var/run/hostapd.wlan0.pid \
              -x /usr/sbin/hostapd
+	sleep 1
+}
+
+func_stop_wl(){
         start-stop-daemon -K \
              -p /var/run/hostapd.wlan1.pid \
              -x /usr/sbin/hostapd
@@ -42,15 +51,25 @@ func_stop(){
 }
 
 case "$1" in
-start)
-    func_start
+start_rt)
+    func_start_rt
     ;;
-stop)
-    func_stop
+start_wl)
+    func_start_wl
     ;;
-restart)
-    func_stop
-    func_start
+stop_wl)
+    func_stop_wl
+    ;;
+stop_rt)
+    func_stop_rt
+    ;;
+restart_rt)
+    func_stop_rt
+    func_start_rt
+    ;;
+restart_wl)
+    func_stop_wl
+    func_start_wl
     ;;
 *)
     echo "Usage: $0 { start | stop | restart }"
