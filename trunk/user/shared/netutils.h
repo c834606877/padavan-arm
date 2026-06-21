@@ -32,6 +32,7 @@
 
 //#define IFUP				(IFF_UP | IFF_RUNNING | IFF_BROADCAST | IFF_MULTICAST)
 #define IFUP				(IFF_UP | IFF_RUNNING)
+#define IFDOWN				(0)
 #define sin_addr(s)			(((struct sockaddr_in *)(s))->sin_addr)
 
 #define IFNAME_BR			"br0"

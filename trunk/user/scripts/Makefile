@@ -29,3 +29,6 @@ endif
 	$(ROMFSINST) /sbin/check_crontab.sh
 	$(ROMFSINST) /etc_ro/hostapd_wlan1.conf
 	$(ROMFSINST) /etc_ro/hostapd.conf
+	
+	$(ROMFSINST) /sbin/sysupgrade-handler.sh
+	

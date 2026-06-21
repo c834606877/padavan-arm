@@ -1,10 +1,19 @@
 #include <stdint.h>
 #include <stdio.h>
+
+#include <net/if.h>
 #include "rc.h"
 #include "netutils.h"
 
-int phy_ports_lan_power(int power_on){return 0;}
-int phy_clear_mac_table(void){ return 0;}
+int phy_ports_lan_power(int power_on){
+	char *p_ifname_list[] = {IFNAME_LAN1, IFNAME_LAN2, IFNAME_LAN3, IFNAME_LAN4};
+	for(int i=0; i<sizeof(p_ifname_list)/sizeof(p_ifname_list[0]); i++){
+		ifconfig(p_ifname_list[i], (power_on) ? IFUP : IFDOWN, NULL, NULL);
+	}
+	return 0;
+}
+int phy_clear_mac_table(void){ 
+	return 0;}
 
 int phy_status_port_link(int port_id_uapi, unsigned int *p_link_on){
 	

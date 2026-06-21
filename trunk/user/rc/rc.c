@@ -518,10 +518,15 @@ flash_firmware(void)
 
 	sync();
 	sleep(1);
-
+/*
 	if (eval("/tmp/mtd_write", "-r", "write", FW_IMG_NAME, FW_MTD_NAME) != 0) {
 		start_watchdog();
 	}
+*/
+	if (eval("bash", "/sbin/sysupgrade-handler.sh", FW_IMG_NAME) != 0) {
+		start_watchdog();
+	}
+
 }
 
 static void

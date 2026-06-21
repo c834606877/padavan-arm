@@ -86,6 +86,7 @@ check_header_image(const char *buf, long *file_len)
 	char pid_asus[16];
 	image_header_t *hdr = (image_header_t *)buf;
 
+	//TODO: make it for general board
 	if (strncmp(buf,"sysupgrade-cmcc_rax3000m-emmc-ubootmod", strlen("sysupgrade-cmcc_rax3000m-emmc-ubootmod")) == 0) 
 	{
 		return 0;
@@ -322,8 +323,7 @@ err:
 void
 do_upgrade_fw_post(const char *url, FILE *stream, int clen, char *boundary)
 {
-	//const char *upload_file = FW_IMG_NAME;
-	const char *upload_file = "/tmp/sysupgrade_cmcc_rax3000m.bin";
+	const char *upload_file = FW_IMG_NAME;
 	int ret;
 
 	/* delete some files (need free space in /tmp) */
@@ -353,6 +353,15 @@ do_upgrade_fw_post(const char *url, FILE *stream, int clen, char *boundary)
 		if (ret != 0)
 			unlink(upload_file);
 	}
+
+	if (ret != 0) {
+		httpd_log("%s: Sysupgrade handler failed with code %d", "Firmware update", ret);
+		unlink(upload_file);
+	}else{
+		httpd_log("%s: Sysupgrade handler executed successfully, device will reboot after upgrade", "Firmware update");
+	}
+
+	return ret;
 }
 
 void

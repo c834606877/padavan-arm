@@ -73,11 +73,21 @@ country_code=${country:-US}
 ieee80211d=1
 EOF
 
-    # 2. Inject 802.11ac (VHT) and 802.11ax (HE) high-throughput extensions for 5G radio
+    # 2. Inject 802.11ac (VHT) and 802.11ax (HE) high-throughput extensions
     if [ "$ifname" = "wlan1" ]; then
         # Default HT40+ configuration for 5G setup to fix "mode (1)" constraint
-        echo "ht_capab=[HT40+]" >> "$conf_file"
-        
+        echo "ht_capab=[HT40+][SHORT-GI-20][SHORT-GI-40]" >> "$conf_file"
+    else
+        # Add HT capabilities for 2.4G (wlan0)
+        if [ "${ht_bw}" = "1" ]; then
+            echo "ht_capab=[HT40+][SHORT-GI-20][SHORT-GI-40]" >> "$conf_file"
+        else
+            echo "ht_capab=[SHORT-GI-20]" >> "$conf_file"
+        fi
+    fi
+
+    # 2b. VHT (802.11ac) high-throughput for 5G radio
+    if [ "$ifname" = "wlan1" ]; then
         # Check if 802.11ac (Wi-Fi 5) is supported (gmode 3, 4, 5 includes ac Mixed)
         if [ "${gmode:-4}" -ge 3 ]; then
             echo "ieee80211ac=1" >> "$conf_file"
@@ -115,34 +125,35 @@ EOF
                 echo "vht_oper_chwidth=0" >> "$conf_file"
             fi
         fi
+    fi
 
-        # Check if 802.11ax (Wi-Fi 6 HE) is preferred (gmode 5 = a/n/ac/ax Mixed)
-        if [ "$gmode" = "5" ]; then
-            echo "ieee80211ax=1" >> "$conf_file"
-            
-            # Dynamically handle Wi-Fi 6 HE Beamforming capabilities
-            if [ "$txbf" = "1" ]; then
-                cat <<EOF >> "$conf_file"
+    # 3. Check if 802.11ax (Wi-Fi 6 HE) is preferred (gmode 5 = a/n/ac/ax Mixed)
+    # HE applies to BOTH 2.4G and 5G when gmode=5
+    if [ "${gmode:-0}" -ge 5 ]; then
+        echo "ieee80211ax=1" >> "$conf_file"
+
+        # Dynamically handle Wi-Fi 6 HE Beamforming capabilities
+        if [ "$txbf" = "1" ]; then
+            cat <<EOF >> "$conf_file"
 he_su_beamformer=1
 he_su_beamformee=1
 EOF
-            else
-                cat <<EOF >> "$conf_file"
+        else
+            cat <<EOF >> "$conf_file"
 he_su_beamformer=0
 he_su_beamformee=0
 EOF
-            fi
+        fi
 
-            # Dynamically handle Wi-Fi 6 HE MU-MIMO capabilities
-            if [ "$mumimo" = "1" ]; then
-                echo "he_mu_beamformer=1" >> "$conf_file"
-            else
-                echo "he_mu_beamformer=0" >> "$conf_file"
-            fi
+        # Dynamically handle Wi-Fi 6 HE MU-MIMO capabilities
+        if [ "$mumimo" = "1" ]; then
+            echo "he_mu_beamformer=1" >> "$conf_file"
+        else
+            echo "he_mu_beamformer=0" >> "$conf_file"
         fi
     fi
 
-    # Handle security mode for the primary interface
+    # 4. Handle security mode for the primary interface
     if [ "$auth_mode" = "open" ] || [ -z "$wpa_key" ]; then
         echo "wpa=0" >> "$conf_file"
     else

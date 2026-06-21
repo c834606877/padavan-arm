@@ -12,7 +12,7 @@ This is an **ARM-based** port of the Padavan firmware, specifically optimized fo
 ## Supported Platforms
 The project currently supports development and deployment on:
 - [x] **QEMU** (Emulation for development)
-- [x] **RAX3000M** (Physical hardware based on MediaTek MT7981)
+- [x] **RAX3000M(emmc)** (Physical hardware based on MediaTek MT7981 with emmc)
 
 ## Development Progress (Current Status)
 The project is under active development. Key milestones achieved:
@@ -33,8 +33,8 @@ The project is under active development. Key milestones achieved:
 - [x] **Features**: CAKE/QoS with TC.
 - [x] *NVRAM*: Works.
 - [x] *LED*: Works.
-- [ ] **Web Upgrade**: (In Progress).
-  - It means you must update the firmware from uboot for currently.
+- [x] **Web Upgrade**: Works.
+  - Supported the sysupgrade style tar to update kerel and rootfs partitions.
 - [!] **Note**: Most unenabled features are currently under discovery and fixing.
 
 ### Demo for WebUI
