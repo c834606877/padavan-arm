@@ -169,10 +169,15 @@ load_usb_modules(void)
 	/* start usb host */
 #if defined (USE_USB_XHCI)
 	{
+#if 0
+		// for old kernel
 		char xhci_param[32];
 		snprintf(xhci_param, sizeof(xhci_param), "%s=%d", "usb3_disable", nvram_get_int("usb3_disable"));
 		module_smart_load("xhci_hcd", xhci_param);
 		module_smart_load("xhci_mtk", NULL);
+#else
+		module_smart_load("xhci-mtk-hcd", NULL);
+#endif
 	}
 #else
 	module_smart_load("ehci_hcd", NULL);
@@ -231,6 +236,16 @@ load_ipset_modules(void)
 	module_smart_load("ip_set_hash_net", NULL);
 }
 #endif
+
+static void
+load_fs_modules(void){
+	module_smart_load("fat", NULL);
+	module_smart_load("vfat", NULL);
+	module_smart_load("f2fs", NULL);
+	module_smart_load("ext4", NULL);
+	module_smart_load("ntfs3", NULL);
+	
+}
 
 static void
 set_timezone(void)
@@ -525,6 +540,7 @@ flash_firmware(void)
 */
 	if (eval("bash", "/sbin/sysupgrade-handler.sh", FW_IMG_NAME) != 0) {
 		start_watchdog();
+		sys_exit();
 	}
 
 }
@@ -749,6 +765,8 @@ fput_string(bl2mtd_para,bl2mtd_value);
 #if defined (USE_IPSET)
 	load_ipset_modules();
 #endif
+
+	load_fs_modules();
 
 	recreate_passwd_unix(1);
 

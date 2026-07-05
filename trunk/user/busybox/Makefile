@@ -8,4 +8,6 @@ clean:
 
 romfs:
 	$(MAKE) -C $(SRC_NAME) CONFIG_PREFIX=$(ROMFSDIR) install
+	mkdir -p $(ROMFSDIR)/usr/bin
+	ln -sf /bin/sed $(ROMFSDIR)/usr/bin/sed
 

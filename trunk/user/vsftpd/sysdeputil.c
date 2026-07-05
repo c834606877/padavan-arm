@@ -132,6 +132,11 @@
   #undef VSF_SYSDEP_HAVE_UTMPX
 #endif
 
+#if defined(__linux__) && !defined(__GLIBC__)
+  #undef VSF_SYSDEP_HAVE_UTMPX
+#endif
+
+
 #include <unistd.h>
 #include <sys/mman.h>
 #ifdef MAP_ANON

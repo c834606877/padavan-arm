@@ -18,7 +18,7 @@ The project currently supports development and deployment on:
 The project is under active development. Key milestones achieved:
 - [x] **Kernel 5.15.167** bootable on ARM/AArch64.
 - [x] **LAN Side Services**:
-  - `dnsmasq` / **DHCP** server is fully functional.
+  - `dnsmasq` / **DHCP** / **Samba** / **vsftpd** servers are fully functional.
   - `httpd` web server is up and running.
   - **WebUI (WWW)** is accessible and stable.
 - [x] **WAN Side**: (udhcpc works for Dyamic IPoE and PPPoE)
@@ -32,6 +32,7 @@ The project is under active development. Key milestones achieved:
   - [ ] `Other Settings from WebUI is ongoing.`
 - [x] **Features**: CAKE/QoS with TC.
 - [x] *NVRAM*: Works.
+- [x] *USB*: Works.
 - [x] *LED*: Works.
 - [x] **Web Upgrade**: Works.
   - Supported the sysupgrade style tar to update kerel and rootfs partitions.

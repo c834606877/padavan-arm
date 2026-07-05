@@ -4,7 +4,8 @@ THISDIR := $(shell pwd)
 
 SMBCFLAGS := $(CFLAGS) -ffunction-sections -fdata-sections
 SMBLDFLAGS := $(LDFLAGS) -Wl,--gc-sections
-SMBCPPFLAGS := -DNDEBUG -DSHMEM_SIZE=524288 -Dfcntl=fcntl64 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE=1 -D_LARGEFILE64_SOURCE=1 -D_LARGE_FILES=1
+#SMBCPPFLAGS := -DNDEBUG -DSHMEM_SIZE=524288 -Dfcntl=fcntl64 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE=1 -D_LARGEFILE64_SOURCE=1 -D_LARGE_FILES=1
+SMBCPPFLAGS := -DNDEBUG -DSHMEM_SIZE=524288 -D_GNU_SOURCE
 MAKE_FLAGS := $(MAKEFLAGS) DYNEXP= PICFLAG= MODULES=
 
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_SMBD_SYSLOG),y)
@@ -46,6 +47,9 @@ configure:
 	samba_cv_have_setresuid=yes \
 	ac_cv_header_zlib_h=no \
 	samba_cv_zlib_1_2_3=no \
+	samba_cv_HAVE_FCNTL_LOCKING=yes\
+	samba_cv_HAVE_STRUCT_FLOCK64=yes\
+	libreplace_cv_HAVE_STRUCT_FLOCK64=yes\
 	ac_cv_path_PYTHON="" \
 	ac_cv_path_PYTHON_CONFIG="" \
 	PKG_CONFIG_PATH="$(STAGEDIR)/lib/pkgconfig" \
