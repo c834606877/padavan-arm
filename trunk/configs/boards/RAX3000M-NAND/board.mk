@@ -1,10 +1,10 @@
 ##################################################################
-# Board PID # Board Name       # PRODUCT # Note
+# Board PID      # Board Name     # PRODUCT # Note
 ##################################################################
-# K2P       # K2P              # MT7621  #
+# RAX3000M-NAND  # RAX3000M-NAND  # MT7981  #
 ##################################################################
 
-CFLAGS += -DBOARD_RAX3000M -DBOARD_MT7615_DBDC
+CFLAGS += -DBOARD_RAX3000M_NAND -DBOARD_MT7615_DBDC
 BOARD_NUM_USB_PORTS=1
 CONFIG_BOARD_RAM_SIZE=128
 

@@ -65,7 +65,7 @@ echo "CONFIG_TOOLCHAIN_DIR=${CONFIG_TOOLCHAIN_DIR}" >> .config
 # load project root config
 . $ROOTDIR/.config
 
-if [ ! -f "$ROOTDIR/vendors/Qemu/config.arch" ] ; then
+if [ ! -f "$ROOTDIR/vendors/$CONFIG_VENDOR/config.arch" ] ; then
 	echo "Project product dir not found! Terminate."
 	exit 1
 fi
@@ -118,7 +118,7 @@ mkdir -p $ROOTDIR/images
 
 echo --------------------------COPY-CONFIG-----------------------------
 ######################### FOR-ALL-DEVICES #############################
-ln -sf vendors/Qemu/config.arch config.arch
+ln -sf vendors/$CONFIG_VENDOR/config.arch config.arch
 cp -fL "$kernel_cf" "$kernel_tf"
 cp -fL "$busybox_cf" "$busybox_tf"
 cp -fL "$board_mk" "$ROOTDIR/user/shared/board.mk"

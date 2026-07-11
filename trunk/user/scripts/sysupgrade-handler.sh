@@ -26,7 +26,8 @@ set -e
 
 FW_UPGRADE_REBOOT="1"
 # Configuration
-BOARD_NAME="cmcc_rax3000m-emmc-ubootmod"
+#BOARD_NAME="cmcc_rax3000m-emmc-ubootmod"
+BOARD_NAME="$1"
 SYSUPGRADE_HEADER="sysupgrade-${BOARD_NAME}"
 KERNEL_PART_DEFAULT="/dev/mmcblk0p5"  # Part 5: kernel
 ROOTFS_PART_DEFAULT="/dev/mmcblk0p6"  # Part 6: rootfs
@@ -315,9 +316,10 @@ flash_rootfs() {
 ###############################################################################
 
 main() {
-	local sysupgrade_file="$1"
-	local kernel_device="${2:-$KERNEL_PART_DEFAULT}"
-	local rootfs_device="${3:-$ROOTFS_PART_DEFAULT}"
+	local config_board_comp="$1"
+	local sysupgrade_file="$2"
+	local kernel_device="${3:-$KERNEL_PART_DEFAULT}"
+	local rootfs_device="${4:-$ROOTFS_PART_DEFAULT}"
 	
 	# Initialize log
 	: > "$LOG_FILE"

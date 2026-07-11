@@ -24,6 +24,12 @@
 //#define FW_IMG_NAME		"/tmp/linux.trx"
 #define FW_IMG_NAME		"/tmp/sysupgrade_"BOARD_NAME".bin"
 
+#ifndef STR_HELPER
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#endif
+
+
 #define LED_OFF         0
 #define LED_ON          1
 

@@ -20,7 +20,7 @@ else
 endif
 endif
 
-VENDOR_CFLAGS =
+VENDOR_CFLAGS = -DCONFIG_BOARD_COMP=qemu_compatible_name
 UOPT = -Os
 LOPT = -Os
 HOST_TARGET = aarch64-linux

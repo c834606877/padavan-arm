@@ -1,8 +1,8 @@
 /* K2P */
 
-#define BOARD_PID		"RAX3000M"
-#define BOARD_NAME		"RAX3000M"
-#define BOARD_DESC		"The Customed RAX3000M router"
+#define BOARD_PID		"RAX3000M-NAND"
+#define BOARD_NAME		"RAX3000M-NAND"
+#define BOARD_DESC		"The Customed RAX3000M-NAND router"
 #define BOARD_VENDOR_NAME	"RAX"
 #define BOARD_VENDOR_URL	"http://www.phicomm.com/"
 #define BOARD_MODEL_URL		"http://www.phicomm.com/"

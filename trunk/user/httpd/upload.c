@@ -86,8 +86,7 @@ check_header_image(const char *buf, long *file_len)
 	char pid_asus[16];
 	image_header_t *hdr = (image_header_t *)buf;
 
-	//TODO: make it for general board
-	if (strncmp(buf,"sysupgrade-cmcc_rax3000m-emmc-ubootmod", strlen("sysupgrade-cmcc_rax3000m-emmc-ubootmod")) == 0) 
+	if (strncmp(buf,"sysupgrade-" STR(CONFIG_BOARD_COMP), strlen("sysupgrade-" STR(CONFIG_BOARD_COMP))) == 0) 
 	{
 		return 0;
 	}
@@ -343,7 +342,7 @@ do_upgrade_fw_post(const char *url, FILE *stream, int clen, char *boundary)
 	/* the sysupgrade not store file length in the header, check boundary marker */
 	snprintf(bndr, sizeof(bndr), "\r\n--%s", boundary);
 
-	int hrd_size = 	strlen("sysupgrade-cmcc_rax3000m-emmc-ubootmod");
+	int hrd_size = 	strlen("sysupgrade-" STR(CONFIG_BOARD_COMP));
 	if (hrd_size < sizeof(image_header_t))
 		hrd_size = sizeof(image_header_t);
 

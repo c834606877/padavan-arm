@@ -538,7 +538,7 @@ flash_firmware(void)
 		start_watchdog();
 	}
 */
-	if (eval("bash", "/sbin/sysupgrade-handler.sh", FW_IMG_NAME) != 0) {
+	if (eval("bash", "/sbin/sysupgrade-handler.sh", STR(CONFIG_BOARD_COMP), FW_IMG_NAME) != 0) {
 		start_watchdog();
 		sys_exit();
 	}

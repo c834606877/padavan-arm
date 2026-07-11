@@ -10,8 +10,8 @@ while true ;do
 	process_status="$(pgrep -f build_firmware_modify)"
 
 	if [ -z "$process_status" ] ;then
-		echo "Build script is exited"
-		if [ -f ./images/*.trx ]; then
+		echo "build_firmware_ci: Build script is exited"
+		if [ -f ./images/sysupgrade_* ] || [ -f ./images/*.trx ]; then
 			tail -20 build.log && exit 0
 		else
 			tail -60 build.log && exit 1

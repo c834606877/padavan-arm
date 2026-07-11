@@ -1,6 +1,6 @@
 KERNELZ		= $(IMAGEDIR)/zImage
 RAMDISK		= $(IMAGEDIR)/ramdisk
-IMAGE		= $(IMAGEDIR)/$(CONFIG_FIRMWARE_PRODUCT_ID)_$(FIRMWARE_KERNEL_VER).$(FIRMWARE_ROOTFS_VER)-$(FIRMWARE_BUILDS_VER).trx
+IMAGE           = $(IMAGEDIR)/sysupgrade_$(CONFIG_BOARD_COMP)_$(shell date +%Y%m%d)_$(FIRMWARE_BUILDS_REV).bin
 BOARD_DIR	= $(ROOTDIR)/configs/boards/$(CONFIG_FIRMWARE_PRODUCT_ID)
 ROMFS_DIR	= $(ROOTDIR)/romfs
 MKIMAGE_DIR	:= $(ROOTDIR)/tools/mkimage
@@ -151,11 +151,10 @@ endif
 
 endif
 
-	#$(DTC) -I dts -O dtb -o RAX3000M_fit_file.fit  RAX3000M_its_file.its ;
 	cd $(IMAGEDIR); \
 	ENTRY=`LANG=C LC_ALL=C $(ENTRY_CMD)` ; \
-	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o RAX3000M_its_file.its -c config-1 -D cmcc_rax3000m-emmc-ubootmod -d $(ROOTDIR)/$(LINUXDIR)/arch/arm64/boot/dts/mediatek/mt7981b-cmcc-rax3000m-emmc-ubootmod.dtb; \
-	PATH=$(DTC_DIR):$(PATH) $(UBOOT_MKIMAGE) -f RAX3000M_its_file.its RAX3000M_fit_file.fit ;\
-	$(SYSUPGRADE_TAR_SH) --board cmcc_rax3000m-emmc-ubootmod --kernel RAX3000M_fit_file.fit --rootfs $(RAMDISK) sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin ;\
-	cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin $(IMAGE);\
-	mkdir ~/workdir/; cp sysupgrade_cmcc_rax3000m-emmc-ubootmod.bin ~/workdir/
+	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o $(CONFIG_FIRMWARE_PRODUCT_ID)_its_file.its -c config-1 -D $(CONFIG_BOARD_COMP) -d $(ROOTDIR)/$(CONFIG_BOARD_DT).dtb; \
+	PATH=$(DTC_DIR):$(PATH) $(UBOOT_MKIMAGE) -f $(CONFIG_FIRMWARE_PRODUCT_ID)_its_file.its $(CONFIG_FIRMWARE_PRODUCT_ID)_fit_file.fit ;\
+	$(SYSUPGRADE_TAR_SH) --board $(CONFIG_BOARD_COMP) --kernel $(CONFIG_FIRMWARE_PRODUCT_ID)_fit_file.fit --rootfs $(RAMDISK) tmp_sysupgrade_$(CONFIG_BOARD_COMP).bin ;\
+	cp tmp_sysupgrade_$(CONFIG_BOARD_COMP).bin $(IMAGE);\
+	mkdir ~/workdir/; cp tmp_sysupgrade_$(CONFIG_BOARD_COMP).bin ~/workdir/

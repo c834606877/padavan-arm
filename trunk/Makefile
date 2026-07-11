@@ -55,7 +55,6 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
 	  else echo sh; fi ; fi)
 
-FIRMWARE_KERNEL_VER="5.15"
 CONFIG_CROSS_COMPILER_ROOT = $(CONFIG_TOOLCHAIN_DIR)/toolchain-aarch64_cortex-a53_gcc-12.3.0_musl
 CONFIG_CROSS_COMPILER_PATH = $(CONFIG_CROSS_COMPILER_ROOT)/bin
 KERNEL_HEADERS_PATH = $(CONFIG_CROSS_COMPILER_ROOT)/musl-1.2.4/include

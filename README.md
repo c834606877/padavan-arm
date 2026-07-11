@@ -13,6 +13,7 @@ This is an **ARM-based** port of the Padavan firmware, specifically optimized fo
 The project currently supports development and deployment on:
 - [x] **QEMU** (Emulation for development)
 - [x] **RAX3000M(emmc)** (Physical hardware based on MediaTek MT7981 with emmc)
+- [x] **RAX3000M(nand)** (Physical hardware based on MediaTek MT7981 with nand) ongoing
 
 ## Development Progress (Current Status)
 The project is under active development. Key milestones achieved:

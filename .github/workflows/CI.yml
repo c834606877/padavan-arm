@@ -27,7 +27,7 @@ jobs:
       matrix:
         include:
           - build_variant: "QEMU"
-            targets: "QEMU RAX3000M"
+            targets: "QEMU RAX3000M RAX3000M-NAND"
 #          - build_variant: "mt7621-usb-1"
 #            targets: "XY-C1 JCG-836PRO JCG-Y2"
 #          - build_variant: "mt7621-usb-2"
@@ -63,7 +63,7 @@ jobs:
           ls -lh ${images_dir}
           GIT_VERSION=`git rev-parse --short=7 HEAD 2>/dev/null` && [ -n "$GIT_VERSION" ] && \
           image_name=images_${build_variant}_${GIT_VERSION} || image_name=images_${build_variant}
-          cd ${images_dir}; md5sum *.trx |tee md5sum.txt; 7z a -mx=9 ${image_name}.7z ./*
+          cd ${images_dir}; md5sum sysupgrade_* |tee md5sum.txt; 7z a -mx=9 ${image_name}.7z ./*
           echo "image_name=${image_name}" >> $GITHUB_ENV
       - name: Upload images to Artifact
         if: ${{ github.event_name != 'release' && success() }}

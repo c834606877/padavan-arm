@@ -301,7 +301,7 @@ get_eeprom_params(void)
 #endif
 
 	/* read firmware header */
-	strcpy(fwver, "3.0.0.0");
+	strcpy(fwver, "5.15.167");
 	strcpy(fwver_sub, fwver);
 	snprintf(productid, sizeof(productid), "%s", BOARD_PID);
 	memset(buffer, 0, sizeof(buffer));
