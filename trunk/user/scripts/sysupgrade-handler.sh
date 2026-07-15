@@ -405,6 +405,9 @@ main() {
 		log_info "Rebooting system in 2 seconds..."
 		sleep 2
 		reboot &
+		sleep 3
+		echo 1 > /proc/sys/kernel/sysrq
+		echo b > /proc/sys/rqtrigger
 	else
 		log_info "Upgrade complete. Reboot required to apply new firmware."
 	fi

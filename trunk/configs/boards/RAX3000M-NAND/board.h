@@ -10,6 +10,8 @@
 #define BOARD_FLASH_TIME	120
 
 #define BOARD_HAS_5G_11AC		1
+#define BOARD_HAS_5G_11AX		1
+#define BOARD_HAS_2G_11AX               1
 #define BOARD_NUM_ANT_5G_TX		2
 #define BOARD_NUM_ANT_5G_RX		2
 #define BOARD_NUM_ANT_2G_TX		2

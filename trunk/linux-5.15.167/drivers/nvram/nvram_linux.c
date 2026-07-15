@@ -35,7 +35,11 @@
 
 #define NVRAM_DRIVER_VERSION	"0.08"
 #define PROC_NVRAM_NAME		"nvram"
-#define MTD_NVRAM_NAME		"config"
+#if defined (CONFIG_MTD_NAND_RALINK) || defined (CONFIG_MTD_NAND_MTK)
+	#define MTD_NVRAM_NAME		"u-boot-env"
+#else
+	#define MTD_NVRAM_NAME		"config"
+#endif
 #define NVRAM_VALUES_SPACE	(NVRAM_MTD_SIZE*2)
 
 extern int mt_mtd_read_nm_wifi(char *name, loff_t from, size_t len, u_char *buf);
