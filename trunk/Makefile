@@ -17,9 +17,9 @@ include .config
 include versions.inc
 
 ifeq ($(CONFIG_WITHOUT_KERNEL),y)
-all: tools unpack_trx libc_only libs_only user_only romfs image
+all: tools unpack_trx libs_only user_only romfs image
 else
-all: tools linux libc_only libs_only user_only romfs image
+all: tools linux libs_only user_only romfs image
 endif
 ############################################################################
 #
