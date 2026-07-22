@@ -591,6 +591,19 @@ init_bridge(int is_ap_mode){
 #endif
 #endif
 #endif
+
+		ifconfig(IFNAME_LAN1, IFUP, NULL, NULL);
+		ifconfig(IFNAME_LAN2, IFUP, NULL, NULL);
+		ifconfig(IFNAME_LAN3, IFUP, NULL, NULL);
+		ifconfig(IFNAME_LAN4, IFUP, NULL, NULL);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN1, 1);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN2, 1);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN3, 1);
+                br_add_del_if(IFNAME_BR, IFNAME_LAN4, 1);
+
+		// MAC2 == eth1 == IFNAME_WAN
+                ifconfig(IFNAME_MAC2, IFUP, NULL, NULL);
+                br_add_del_if(IFNAME_BR, IFNAME_MAC2, 1);
         }
 // Let bridge trafic directly go through without Nat
 	doSystem("echo 0 >/proc/sys/net/bridge/bridge-nf-call-iptables" );
