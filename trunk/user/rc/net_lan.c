@@ -552,7 +552,7 @@ init_bridge(int is_ap_mode){
 	br_add_del_bridge(IFNAME_BR, 1);
         br_set_stp(IFNAME_BR, 0);
         br_set_fd(IFNAME_BR, 2);
-        //set_interface_hwaddr(IFNAME_BR, lan_hwaddr);
+        set_interface_hwaddr(IFNAME_BR, lan_hwaddr);
 	
 	if (!is_ap_mode) {
                 /* add eth2 (or eth2.1) to bridge */
