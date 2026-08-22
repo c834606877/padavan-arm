@@ -1,6 +1,7 @@
 #SRC_NAME=hostapd-2.11/hostapd
-SRC_NAME=hostapd-2.10/hostapd
-SRC_VER=2.10
+#SRC_NAME=hostapd-2.10/hostapd
+SRC_NAME=hostapd-2.12/hostapd
+SRC_VER=2.12
 SRC_URL=https://w1.fi/releases/hostapd-$(SRC_VER).tar.gz
 
 CFLAGS += -ffunction-sections -fdata-sections
@@ -10,7 +11,7 @@ THISDIR = $(shell pwd)
 
 all: download_test extract_test #config_test
 	cp hostapd.padavan.config $(THISDIR)/$(SRC_NAME)/.config
-	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME) 
+	PKG_CONFIG_PATH=/home/user/AppBuild/padavan-arm/trunk/stage/lib/pkgconfig PKG_CONFIG=/usr/bin/pkg-config $(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME) 
 
 download_test:
 	( if [ ! -f hostapd-$(SRC_VER).tar.gz ]; then \
