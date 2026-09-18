@@ -685,6 +685,21 @@ EOF
 	fi
 }
 
+# This legacy script only understands a raw "Storage" MTD partition; without it
+# func_get_mtd() gives up (and 'save' is what the WebUI calls whenever a setting
+# is stored, so that would silently lose configuration).  The merged
+# storage_main.sh additionally supports UBI volumes (Xiaomi AX3000T,
+# CMCC RAX3000M-NAND, ...) and the eMMC rootfs tail space, so hand the request
+# over whenever there is no "Storage" MTD partition at all.
+# The command names of the two scripts match for the delegated subset.
+if ! grep -q '"Storage"' /proc/mtd 2>/dev/null ; then
+	case "$1" in
+	load|restore|save|clear|reset)
+		exec /sbin/storage_main.sh "$@"
+		;;
+	esac
+fi
+
 case "$1" in
 load)
 	func_get_mtd

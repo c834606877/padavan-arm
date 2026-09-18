@@ -541,10 +541,18 @@ flash_firmware(void)
 		start_watchdog();
 	}
 */
+#if defined (BOARD_XIAOMI_AX3000T)
+	/* AX3000T keeps the image in UBI volumes, use the universal handler */
+	if (eval("bash", "/sbin/sysupgrade-handler-uni.sh", STR(CONFIG_BOARD_COMP), FW_IMG_NAME) != 0) {
+		start_watchdog();
+		sys_exit();
+	}
+#else
 	if (eval("bash", "/sbin/sysupgrade-handler.sh", STR(CONFIG_BOARD_COMP), FW_IMG_NAME) != 0) {
 		start_watchdog();
 		sys_exit();
 	}
+#endif
 
 }
 

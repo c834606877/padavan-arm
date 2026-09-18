@@ -1,0 +1,151 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Xiaomi Mi Router AX3000T (RD03)
+ *   SoC      : MediaTek MT7981B (Filogic 820)
+ *   WiFi     : MT7976C (2.4G + 5G, DBDC)
+ *   RAM      : 256MB DDR3
+ *   Flash    : 128MB SPI-NAND (ESMT F50L1G41LB / Winbond W25N01GV)
+ *   Ethernet : MT7981 internal MT7531 switch, 1x WAN + 3x LAN
+ *   Buttons  : reset (GPIO1), mesh (GPIO0)
+ *   LEDs     : blue:status (GPIO9), yellow:status (GPIO10)
+ *
+ * Derived from the hardware description used by ImmortalWrt / OpenWrt
+ * (target/linux/mediatek/dts/mt7981b-xiaomi-mi-router-common.dtsi).
+ */
+
+/dts-v1/;
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+#include "mt7981.dtsi"
+
+/ {
+	model = "Xiaomi Mi Router AX3000T";
+	compatible = "xiaomi,mi-router-ax3000t", "mediatek,mt7981";
+
+	aliases {
+		serial0 = &uart0;
+		led-boot = &led_status_yellow;
+		led-failsafe = &led_status_yellow;
+		led-running = &led_status_blue;
+		led-upgrade = &led_status_yellow;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	memory {
+		reg = <0 0x40000000 0 0x10000000>;
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		button-reset {
+			label = "reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&pio 1 GPIO_ACTIVE_LOW>;
+		};
+
+		button-mesh {
+			label = "mesh";
+			linux,code = <BTN_9>;
+			linux,input-type = <EV_SW>;
+			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+
+		led_status_blue: led-0 {
+			label = "blue:status";
+			gpios = <&pio 9 GPIO_ACTIVE_LOW>;
+		};
+
+		led_status_yellow: led-1 {
+			label = "yellow:status";
+			gpios = <&pio 10 GPIO_ACTIVE_LOW>;
+		};
+	};
+};
+
+&eth {
+	status = "okay";
+
+	gmac0: mac@0 {
+		compatible = "mediatek,eth-mac";
+		reg = <0>;
+		phy-mode = "2500base-x";
+
+		fixed-link {
+			speed = <2500>;
+			full-duplex;
+			pause;
+		};
+	};
+};
+
+&mdio_bus {
+	switch: switch@1f {
+		compatible = "mediatek,mt7531";
+		reg = <31>;
+		reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
+		interrupt-controller;
+		#interrupt-cells = <1>;
+		interrupt-parent = <&pio>;
+		interrupts = <38 IRQ_TYPE_LEVEL_HIGH>;
+	};
+};
+
+&switch {
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			label = "wan";
+		};
+
+		port@1 {
+			reg = <1>;
+			label = "lan1";
+		};
+
+		port@2 {
+			reg = <2>;
+			label = "lan2";
+		};
+
+		port@3 {
+			reg = <3>;
+			label = "lan3";
+		};
+
+		port@6 {
+			reg = <6>;
+			ethernet = <&gmac0>;
+			phy-mode = "2500base-x";
+
+			fixed-link {
+				speed = <2500>;
+				full-duplex;
+				pause;
+			};
+		};
+	};
+};
+
+&uart0 {
+	status = "okay";
+};
+
+&watchdog {
+	status = "okay";
+};
+
+&wifi {
+	status = "okay";
+};

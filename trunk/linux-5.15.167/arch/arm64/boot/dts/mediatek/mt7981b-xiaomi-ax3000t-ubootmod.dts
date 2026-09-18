@@ -1,0 +1,190 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Xiaomi Mi Router AX3000T with a custom U-Boot layout.
+ *
+ * The stock Xiaomi U-Boot only boots Xiaomi signed images, so the FIP
+ * partition is replaced by the OpenWrt/ImmortalWrt U-Boot for this board
+ * (flashed through mtk_uartboot + a USB-TTL adapter, exactly like the
+ * RAX3000M port does).
+ *
+ * Partition map (identical to the one used by that U-Boot, so that both
+ * the bootloader and Linux agree on the flash layout):
+ *
+ *   0x000000 - 0x100000  BL2        (ATF BL2, read-only)
+ *   0x100000 - 0x140000  u-boot-env (padavan NVRAM storage, 128K used of 256K)
+ *   0x140000 - 0x180000  Bdata      (Xiaomi board data, holds ethaddr/ethaddr_wan)
+ *   0x180000 - 0x380000  Factory    (calibration data + base MAC)
+ *   0x380000 - 0x580000  FIP        (ATF BL31 + U-Boot)
+ *   0x580000 - 0x5c0000  crash
+ *   0x5c0000 - 0x600000  crash_log
+ *   0x600000 - 0x7600000 ubi        (U-Boot env + padavan kernel/rootfs)
+ *   0x7600000- 0x7640000 KF         (Xiaomi "keep flag", read-only)
+ *
+ * NOTE: the partition at 0x100000 is named "u-boot-env" on purpose, even
+ * though the stock Xiaomi layout calls it "Nvram".  padavan's kernel nvram
+ * driver (drivers/nvram/nvram_linux.c) looks up MTD_NVRAM_NAME == "u-boot-env"
+ * on NAND boards and silently falls back to a RAM buffer if the partition is
+ * missing, which would make every setting disappear on reboot.  The U-Boot
+ * environment of the ubootmod bootloader lives in the UBI volume
+ * "ubootenv"/"ubootenv2" instead, so this partition is free for padavan.
+ */
+
+/dts-v1/;
+#include "mt7981b-xiaomi-ax3000t.dts"
+
+/ {
+	model = "Xiaomi Mi Router AX3000T (custom U-Boot layout)";
+	compatible = "xiaomi,mi-router-ax3000t-ubootmod", "mediatek,mt7981";
+
+	aliases {
+		label-mac-device = &gmac0;
+	};
+
+	chosen {
+		/*
+		 * The squashfs root filesystem is embedded in the FIT image as
+		 * "ramdisk" sub-image (see CONFIG_FIRMWARE_FIT_WITH_ROOTFS), so it
+		 * is mounted straight from the ramdisk.  "ubi.mtd=ubi" makes the
+		 * kernel attach UBI itself, which is what padavan's storage script
+		 * (user/scripts/storage_main.sh) needs for /etc/storage.
+		 *
+		 * bootargs-append is honoured by this kernel (drivers/of/fdt.c) and
+		 * is appended to the command line that U-Boot hands over, so the
+		 * U-Boot environment does not have to be touched.
+		 */
+		stdout-path = "serial0:115200n8";
+		bootargs-append = " console=ttyS0,115200n1 earlycon=uart8250,mmio32,0x11002000 loglevel=8 root=/dev/ram0 rw rootfstype=squashfs ubi.mtd=ubi";
+	};
+};
+
+&gmac0 {
+	nvmem-cells = <&macaddr_factory_4 (-2)>;
+	nvmem-cell-names = "mac-address";
+};
+
+&spi0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&spi0_flash_pins>;
+	status = "okay";
+
+	spi_nand: flash@0 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-nand";
+		reg = <0>;
+
+		spi-cal-enable;
+		spi-cal-mode = "read-data";
+		spi-cal-datalen = <7>;
+		spi-cal-data = /bits/ 8 <0x53 0x50 0x49 0x4e 0x41 0x4e 0x44>;
+		spi-cal-addrlen = <5>;
+		spi-cal-addr = /bits/ 32 <0x0 0x0 0x0 0x0 0x0>;
+
+		spi-max-frequency = <52000000>;
+		spi-tx-bus-width = <4>;
+		spi-rx-bus-width = <4>;
+		mediatek,nmbm;
+		mediatek,bmt-max-ratio = <1>;
+		mediatek,bmt-max-reserved-blocks = <64>;
+
+		partitions: partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "BL2";
+				reg = <0x000000 0x100000>;
+				read-only;
+			};
+
+			partition@100000 {
+				/*
+				 * Xiaomi calls this partition "Nvram"; padavan's
+				 * nvram driver requires the name "u-boot-env"
+				 * (see the comment at the top of this file).
+				 */
+				label = "u-boot-env";
+				reg = <0x100000 0x40000>;
+			};
+
+			partition@140000 {
+				label = "Bdata";
+				reg = <0x140000 0x40000>;
+			};
+
+			factory: partition@180000 {
+				label = "Factory";
+				reg = <0x180000 0x200000>;
+				read-only;
+
+				compatible = "nvmem-cells";
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					macaddr_factory_4: macaddr@4 {
+						compatible = "mac-base";
+						reg = <0x4 0x6>;
+						#nvmem-cell-cells = <1>;
+					};
+				};
+			};
+
+			partition@380000 {
+				label = "FIP";
+				reg = <0x380000 0x200000>;
+				read-only;
+			};
+
+			partition@580000 {
+				label = "crash";
+				reg = <0x580000 0x40000>;
+				read-only;
+			};
+
+			partition@5c0000 {
+				label = "crash_log";
+				reg = <0x5c0000 0x40000>;
+				read-only;
+			};
+
+			partition@600000 {
+				label = "ubi";
+				reg = <0x600000 0x7000000>;
+			};
+
+			partition@7600000 {
+				label = "KF";
+				reg = <0x7600000 0x40000>;
+				read-only;
+			};
+		};
+	};
+};
+
+&pio {
+	spi0_flash_pins: spi0-pins {
+		mux {
+			function = "spi";
+			groups = "spi0", "spi0_wp_hold";
+		};
+
+		conf-pu {
+			pins = "SPI0_CS", "SPI0_HOLD", "SPI0_WP";
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-up = <MTK_PUPD_SET_R1R0_11>;
+		};
+
+		conf-pd {
+			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
+			drive-strength = <MTK_DRIVE_8mA>;
+			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
+		};
+	};
+};
+
+&wifi {
+	mediatek,mtd-eeprom = <&factory 0x0>;
+};

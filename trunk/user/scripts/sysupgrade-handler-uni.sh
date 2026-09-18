@@ -39,6 +39,18 @@ UBI_DATA_VOL="rootfs_data"   # UBI volume for overlay (auto-resize)
 NAND_KERN_PART="kernel"      # raw NAND kernel MTD partition
 NAND_ROOT_PART="rootfs"      # raw NAND rootfs MTD partition
 
+# Board specific UBI volume naming.
+# The Xiaomi AX3000T is booted by the stock OpenWrt/ImmortalWrt U-Boot, which
+# reads the production image from the UBI volume "fit" (see boot_production /
+# ubi_read_production in that U-Boot).  The squashfs rootfs is embedded in the
+# very same FIT as "ramdisk" sub-image, so no separate rootfs volume is used.
+case "$BOARD_NAME" in
+	xiaomi_ax3000t*)
+		UBI_KERN_VOL="fit"
+		UBI_ROOT_VOL=""
+		;;
+esac
+
 # Status codes
 SUCCESS=0
 ERR_INVALID_FILE=1
@@ -233,6 +245,13 @@ verify_kernel_file() {
 	local kernel_size=$(stat -c%s "$kernel_file" 2>/dev/null || stat -f%z "$kernel_file" 2>/dev/null)
 	local min_size=$((1024 * 1024))  # 1 MB minimum
 	local max_size=$((32 * 1024 * 1024))  # 32 MB maximum
+
+	# Boards that embed the squashfs rootfs into the FIT (e.g. the Xiaomi
+	# AX3000T) ship one combined kernel+rootfs image, which is much bigger
+	# than a plain kernel - allow up to the size of the UBI partition.
+	if [ "$UBI_KERN_VOL" = "fit" ]; then
+		max_size=$((112 * 1024 * 1024))
+	fi
 
 	if [ "$kernel_size" -lt "$min_size" ]; then
 		log_error "Kernel file too small: $kernel_size bytes (minimum: $min_size bytes)"
@@ -455,8 +474,8 @@ flash_ubi() {
 		fi
 	fi
 
-	# Rootfs volume
-	if tar -tf "$sysupgrade_file" "$board_dir/root" > /dev/null 2>&1; then
+	# Rootfs volume (skipped for boards that embed the rootfs into the FIT)
+	if [ -n "$UBI_ROOT_VOL" ] && tar -tf "$sysupgrade_file" "$board_dir/root" > /dev/null 2>&1; then
 		local rootfs_length=$(tar -xOf "$sysupgrade_file" "$board_dir/root" 2>/dev/null | wc -c)
 		if [ -n "$rootfs_length" ] && [ "$rootfs_length" -gt 0 ]; then
 			update_volume "$UBI_ROOT_VOL" "$rootfs_length" "$board_dir/root" || return 1

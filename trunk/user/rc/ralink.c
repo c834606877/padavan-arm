@@ -190,6 +190,22 @@ get_wired_mac(int is_wan)
 	unsigned char buffer[ETHER_ADDR_LEN] = {0};
 	int i_offset;
 
+#if defined (BOARD_XIAOMI_AX3000T)
+	/*
+	 * AX3000T: the Ethernet MACs live as ASCII key/value pairs in "Bdata".
+	 */
+	{
+		char kv[32] = {0};
+
+		if (flash_mtd_read_ascii_kv(MTD_PART_NAME_BDATA,
+					    is_wan ? "ethaddr_wan" : "ethaddr",
+					    kv, sizeof(kv)) == 0) {
+			printf("%s Bdata MAC address: %s\n", (is_wan) ? "WAN" : "LAN", kv);
+			return 0;
+		}
+	}
+#endif
+
 	i_offset = get_wired_mac_e2p_offset(is_wan);
 	if (flash_mtd_read(MTD_PART_NAME_FACTORY, i_offset, buffer, ETHER_ADDR_LEN) < 0) {
 		puts("Unable to read MAC from EEPROM!");
@@ -211,6 +227,12 @@ set_wired_mac(int is_wan, const char *mac)
 {
 	unsigned char ea[ETHER_ADDR_LEN] = {0};
 	int i_offset;
+
+#if defined (BOARD_XIAOMI_AX3000T)
+	printf("AX3000T stores the Ethernet MACs in the \"Bdata\" partition, "
+	       "writing them from the WebUI is not supported!\n");
+	return EINVAL;
+#endif
 
 	if (is_wan && get_wired_mac_is_single()) {
 		printf("This device has only single wired MAC-address!\n");

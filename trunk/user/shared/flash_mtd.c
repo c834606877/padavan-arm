@@ -119,8 +119,7 @@ mtd_block_is_bad(int fd, int mtd_type, loff_t offset)
 
 static ssize_t
 read_safe(int fd, unsigned char *buf, size_t buf_len)
-{
-	size_t r_len = 0;
+{	size_t r_len = 0;
 
 	while (r_len < buf_len) {
 		ssize_t ret = read(fd, buf + r_len, buf_len - r_len);
@@ -350,5 +349,62 @@ out_err:
 	close(fd);
 
 	return ret;
+}
+
+/*
+ * Read a "key=value" item from an ASCII key/value block (each item on its
+ * own line, "key=value\n") that some bootloaders keep at the beginning of
+ * an MTD partition - Xiaomi does this for "ethaddr" / "ethaddr_wan" inside
+ * the "Bdata" partition of the AX3000T.
+ *
+ * Returns 0 when the key was found (value is NUL terminated), 1 when the
+ * partition could be read but the key is missing, < 0 on I/O error.
+ */
+int
+flash_mtd_read_ascii_kv(const char *mtd_part, const char *key, char *value, size_t value_size)
+{
+	unsigned char buf[2048];
+	char *line, *line_end, *eq, *buf_end;
+	size_t key_len;
+	int ret;
+
+	if (!mtd_part || !key || !value || value_size < 2)
+		return -1;
+
+	value[0] = '\0';
+
+	ret = flash_mtd_read(mtd_part, 0, buf, sizeof(buf) - 1);
+	if (ret < 0)
+		return ret;
+
+	buf[sizeof(buf) - 1] = '\0';
+
+	key_len = strlen(key);
+	buf_end = (char *)buf + sizeof(buf) - 1;
+
+	for (line = (char *)buf; line < buf_end; ) {
+		line_end = memchr(line, '\n', buf_end - line);
+		if (!line_end)
+			line_end = buf_end;
+		else
+			*line_end = '\0';
+
+		/* strip CR / trailing blanks of this line */
+		while (line < line_end && (line_end[-1] == '\r' || line_end[-1] == ' '))
+			*(--line_end) = '\0';
+
+		eq = strchr(line, '=');
+		if (eq && (size_t)(eq - line) == key_len && !strncmp(line, key, key_len)) {
+			snprintf(value, value_size, "%s", eq + 1);
+			return 0;
+		}
+
+		if (line_end == buf_end)
+			break;
+
+		line = line_end + 1;
+	}
+
+	return 1;
 }
 

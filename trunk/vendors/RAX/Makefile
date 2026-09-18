@@ -29,6 +29,15 @@ DTC_DIR = $(ROOTDIR)/$(LINUXDIR)/scripts/dtc/
 SYSUPGRADE_TAR_SH = $(ROOTDIR)/tools/sysupgrade-tar.sh
 #sysupgrade-tar.sh [--board boardname] [--kernel kernelimage] [--rootfs rootfs] out
 
+# Some boards (e.g. Xiaomi AX3000T) boot a single FIT image from a UBI volume
+# instead of having separate kernel / rootfs partitions.  For those the squashfs
+# rootfs has to be embedded into the FIT as "ramdisk" sub-image, which the
+# kernel then mounts with "root=/dev/ram0".
+ifeq ($(CONFIG_FIRMWARE_FIT_WITH_ROOTFS),y)
+FIT_ROOTFS_OPT	= -i $(RAMDISK)
+FIT_EXTRA_CMDS	= cp -f $(IMAGEDIR)/$(CONFIG_FIRMWARE_PRODUCT_ID)_fit_file.fit $(IMAGEDIR)/fit_$(CONFIG_BOARD_COMP)_$(shell date +%Y%m%d)_$(FIRMWARE_BUILDS_REV).itb ; cp -f $(IMAGEDIR)/$(CONFIG_FIRMWARE_PRODUCT_ID)_fit_file.fit ~/workdir/$(CONFIG_BOARD_COMP).itb
+endif
+
 UBOOT_MKIMAGE	:= $(ROOTDIR)/tools/u-boot/mkimage
 
 ifeq ($(CONFIG_WITHOUT_KERNEL),y)
@@ -153,8 +162,12 @@ endif
 
 	cd $(IMAGEDIR); \
 	ENTRY=`LANG=C LC_ALL=C $(ENTRY_CMD)` ; \
-	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o $(CONFIG_FIRMWARE_PRODUCT_ID)_its_file.its -c config-1 -D $(CONFIG_BOARD_COMP) -d $(ROOTDIR)/$(CONFIG_BOARD_DT).dtb; \
+	$(MKITS_SH)  -A arm64 -C lzma -a 0x$(LOAD_ADDR) -e 0x$(LOAD_ADDR) -k $(KERNELZ).$(COMP) -v $(FIRMWARE_KERNEL_VER) -o $(CONFIG_FIRMWARE_PRODUCT_ID)_its_file.its -c config-1 -D $(CONFIG_BOARD_COMP) -d $(ROOTDIR)/$(CONFIG_BOARD_DT).dtb $(FIT_ROOTFS_OPT); \
 	PATH=$(DTC_DIR):$(PATH) $(UBOOT_MKIMAGE) -f $(CONFIG_FIRMWARE_PRODUCT_ID)_its_file.its $(CONFIG_FIRMWARE_PRODUCT_ID)_fit_file.fit ;\
 	$(SYSUPGRADE_TAR_SH) --board $(CONFIG_BOARD_COMP) --kernel $(CONFIG_FIRMWARE_PRODUCT_ID)_fit_file.fit --rootfs $(RAMDISK) tmp_sysupgrade_$(CONFIG_BOARD_COMP).bin ;\
 	cp tmp_sysupgrade_$(CONFIG_BOARD_COMP).bin $(IMAGE);\
 	mkdir ~/workdir/; cp tmp_sysupgrade_$(CONFIG_BOARD_COMP).bin ~/workdir/
+	# Also keep the bare FIT: this is what the U-Boot flash menu / TFTP wants
+	# ("Load production system via TFTP then write to NAND").  Empty for boards
+	# that do not embed the rootfs into the FIT.
+	$(FIT_EXTRA_CMDS)

@@ -231,6 +231,7 @@ typedef struct _PAIR_CHANNEL_FREQ_ENTRY
 #define RT_OID_WSC_PIN_CODE		((RT_OID_SYNC_RT61 + 0x02) & 0xffff)
 
 #define MTD_PART_NAME_FACTORY	"Factory"
+#define MTD_PART_NAME_BDATA	"Bdata"
 #define MTD_PART_NAME_KERNEL	"kernel"
 #define MTD_PART_NAME_RWFS	"RWFS"
 
@@ -240,6 +241,15 @@ typedef struct _PAIR_CHANNEL_FREQ_ENTRY
 #elif defined (CONFIG_RALINK_MT7621)
 #define OFFSET_MAC_GMAC0	0xE000
 #define OFFSET_MAC_GMAC2	0xE006
+#elif defined (BOARD_XIAOMI_AX3000T)
+/*
+ * Xiaomi Mi Router AX3000T: the real Ethernet MACs are stored as ASCII
+ * "ethaddr" / "ethaddr_wan" key/value pairs inside the "Bdata" partition,
+ * only the wifi base MAC lives in "Factory" at offset 0x4.
+ * See xiaomi_ax3000t_macs() in user/rc/common_ex.c.
+ */
+#define OFFSET_MAC_GMAC0	0x0004
+#define OFFSET_MAC_GMAC2	0x0004
 #elif defined (CONFIG_MT7981)
 #define OFFSET_MAC_GMAC0	0x002a
 #define OFFSET_MAC_GMAC2	0x0024

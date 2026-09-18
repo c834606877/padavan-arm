@@ -51,28 +51,43 @@ mount_persistent_media() {
                 done
             done
 
-            # Fallback: If no recognized labels found, select any secondary volume except ubi0_0
-            if [ -z "$ACTIVE_UBI_DEV" ] && [ -d "/sys/class/ubi/ubi0_1" ]; then
-                ACTIVE_UBI_DEV="/dev/ubi0_1"
-                echo "STORAGE INIT: Fallback applied. Selecting existing volume at $ACTIVE_UBI_DEV"
+            # Fallback: If no recognized labels found, select any other volume,
+            # but never touch volumes owned by the bootloader
+            # (ubootenv / ubootenv2 / fit / recovery).
+            if [ -z "$ACTIVE_UBI_DEV" ]; then
+                for name_node in /sys/class/ubi/ubi0_*/name; do
+                    [ -f "$name_node" ] || continue
+                    case "$(cat "$name_node")" in
+                        ubootenv|ubootenv2|fit|recovery) continue ;;
+                    esac
+                    vol_dir=$(dirname "$name_node")
+                    ACTIVE_UBI_DEV="/dev/$(basename "$vol_dir")"
+                    echo "STORAGE INIT: Fallback applied. Selecting existing volume at $ACTIVE_UBI_DEV"
+                    break
+                done
             fi
         fi
 
         # Sub-step C: Dynamic Creation (If no suitable volume exists, create a new one named 'storage')
         if [ -z "$ACTIVE_UBI_DEV" ] && [ -e "/dev/ubi0" ]; then
-            FREE_BLOCKS=$(cat /sys/class/ubi/ubi0/avail_er_blocks 2>/dev/null)
+            FREE_BLOCKS=$(cat /sys/class/ubi/ubi0/avail_eraseblocks 2>/dev/null)
             echo "STORAGE INIT: Unallocated UBI memory blocks available: ${FREE_BLOCKS:-0}"
 
             if [ ! -z "$FREE_BLOCKS" ] && [ "$FREE_BLOCKS" -gt 4 ]; then
                 echo "STORAGE INIT: No valid volume found. Executing dynamic creation via ubimkvol..."
                 ubimkvol /dev/ubi0 -N storage -m 2>/dev/null
-                
-                if [ $? -eq 0 ] || [ -d "/sys/class/ubi/ubi0_1" ]; then
-                    if [ -e "/dev/ubi0_1" ]; then
-                        ACTIVE_UBI_DEV="/dev/ubi0_1"
-                    else
-                        ACTIVE_UBI_DEV="ubi0:storage"
+
+                # Resolve the new volume by NAME - its id is not known in
+                # advance (ubootenv/ubootenv2/fit usually occupy ids 0..2).
+                for name_node in /sys/class/ubi/ubi0_*/name; do
+                    [ -f "$name_node" ] || continue
+                    if [ "$(cat "$name_node")" = "storage" ]; then
+                        ACTIVE_UBI_DEV="/dev/$(basename "$(dirname "$name_node")")"
+                        break
                     fi
+                done
+
+                if [ -n "$ACTIVE_UBI_DEV" ]; then
                     echo "STORAGE INIT: Dynamic creation successful. Selected target: $ACTIVE_UBI_DEV"
                 else
                     echo "STORAGE INIT ERROR: ubimkvol binary execution aborted or failed."
@@ -87,7 +102,16 @@ mount_persistent_media() {
                 echo "STORAGE INIT: UBIFS cleanly mounted onto $TARGET_MNT."
                 return 0
             else
-                echo "STORAGE INIT ERROR: Target $ACTIVE_UBI_DEV is raw. Attempting to skip mount."
+                # This build has no mkfs.ubifs (user/mtd-utils is configured
+                # with --without-ubifs), so a freshly created volume can never
+                # be formatted as UBIFS.  Keep the compressed storage archive
+                # directly inside the raw UBI volume instead - the volume is
+                # readable/writable as a plain character device and
+                # ubiupdatevol (mtd-utils, always installed) sets its size.
+                echo "STORAGE INIT: $ACTIVE_UBI_DEV is not UBIFS, using raw UBI volume mode."
+                echo "$ACTIVE_UBI_DEV" > /tmp/.storage_ubi_dev
+                touch /tmp/.storage_is_ubi_raw
+                return 0
             fi
         fi
     fi
@@ -162,6 +186,25 @@ mount_persistent_media() {
     return 1
 }
 
+# Resolve the UBI volume used in "raw UBI volume" mode.
+# Prefers the volume selected at load time, otherwise re-detects it.
+get_ubi_raw_dev() {
+    if [ -s /tmp/.storage_ubi_dev ]; then
+        cat /tmp/.storage_ubi_dev
+        return 0
+    fi
+    for name_node in /sys/class/ubi/ubi0_*/name; do
+        [ -f "$name_node" ] || continue
+        case "$(cat "$name_node")" in
+            storage|ubi_data|rootfs_data)
+                echo "/dev/$(basename "$(dirname "$name_node")")"
+                return 0
+                ;;
+        esac
+    done
+    return 1
+}
+
 # Resolve active storage type based on runtime environment
 get_media_type() {
     if grep -q "$TARGET_MNT" /proc/mounts; then
@@ -173,6 +216,8 @@ get_media_type() {
     elif [ -f /tmp/.storage_is_nand_mtd ] || grep -q '"Storage"' /proc/mtd; then
         MEDIA_TYPE="NAND_MTD"
         MTD_PART_NAME="Storage"
+    elif [ -f /tmp/.storage_is_ubi_raw ] || [ -n "$(get_ubi_raw_dev 2>/dev/null)" ]; then
+        MEDIA_TYPE="UBI_RAW"
     else
         MEDIA_TYPE="RAM_ONLY"
     fi
@@ -208,6 +253,21 @@ func_restore() {
                 tar -xjf "$TMP_BZ2_FILE" -C "$STORAGE_DIR" 2>/dev/null
                 rm -f "$TMP_BZ2_FILE"
                 echo "STORAGE MAIN: Restore from raw NAND MTD successful."
+            fi
+            ;;
+        "UBI_RAW")
+            ubi_raw_dev="$(get_ubi_raw_dev 2>/dev/null)"
+            if [ -n "$ubi_raw_dev" ]; then
+                dd if="$ubi_raw_dev" of="$TMP_BZ2_FILE" bs=4096 2>/dev/null
+                if [ -s "$TMP_BZ2_FILE" ]; then
+                    tar -xjf "$TMP_BZ2_FILE" -C "$STORAGE_DIR" 2>/dev/null
+                    echo "STORAGE MAIN: Restore from raw UBI volume $ubi_raw_dev successful."
+                else
+                    echo "STORAGE MAIN: No configuration backup file found."
+                fi
+                rm -f "$TMP_BZ2_FILE"
+            else
+                echo "STORAGE MAIN WARNING: No usable UBI volume found."
             fi
             ;;
         *)
@@ -260,6 +320,19 @@ func_save() {
                 echo "STORAGE MAIN: Configuration saved to raw NAND MTD."
             fi
             ;;
+        "UBI_RAW")
+            ubi_raw_dev="$(get_ubi_raw_dev 2>/dev/null)"
+            if [ -n "$ubi_raw_dev" ] && [ -x /sbin/ubiupdatevol ]; then
+                if /sbin/ubiupdatevol "$ubi_raw_dev" "$TMP_BZ2_FILE"; then
+                    sync
+                    echo "STORAGE MAIN: Configuration saved to raw UBI volume $ubi_raw_dev."
+                else
+                    echo "STORAGE MAIN ERROR: Failed to write to $ubi_raw_dev!"
+                fi
+            else
+                echo "STORAGE MAIN ERROR: No usable UBI volume / ubiupdatevol missing!"
+            fi
+            ;;
         *)
             echo "STORAGE MAIN ERROR: No persistent writable media found to commit changes!"
             ;;
@@ -279,6 +352,12 @@ func_clear() {
             ;;
         "NAND_MTD")
             [ -x "/sbin/mtd_write" ] && mtd_write erase "$MTD_PART_NAME" 2>/dev/null
+            ;;
+        "UBI_RAW")
+            ubi_raw_dev="$(get_ubi_raw_dev 2>/dev/null)"
+            if [ -n "$ubi_raw_dev" ] && [ -x /sbin/ubiupdatevol ]; then
+                /sbin/ubiupdatevol "$ubi_raw_dev" -t 2>/dev/null && sync
+            fi
             ;;
     esac
 

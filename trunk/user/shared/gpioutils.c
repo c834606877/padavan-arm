@@ -16,8 +16,12 @@ const char* led_to_name(int led)
 		case LED_SW5G:
 			return "sw5g";
 		case LED_WAN:
+#if defined (BOARD_XIAOMI_AX3000T)
+			return "yellow:status";
+#else
 			return "green:status";
 			//"wan";
+#endif
 		case LED_LAN:
 			return "lan";
 		case LED_USB:
@@ -57,7 +61,11 @@ search_gpio_led(void)
 					leds |= LED_SW2G;
 				} else if (!strcmp(dirp->d_name, "sw5g")) {
 					leds |= LED_SW5G;
-				} else if (!strcmp(dirp->d_name, "wan") || !strcmp(dirp->d_name, "green:status") ) {
+				} else if (!strcmp(dirp->d_name, "wan") || !strcmp(dirp->d_name, "green:status")
+#if defined (BOARD_XIAOMI_AX3000T)
+					|| !strcmp(dirp->d_name, "yellow:status")
+#endif
+					) {
 					leds |= LED_WAN;
 				} else if (!strcmp(dirp->d_name, "lan")) {
 					leds |= LED_LAN;

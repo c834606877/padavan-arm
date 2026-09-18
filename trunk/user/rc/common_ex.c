@@ -129,6 +129,74 @@ valid_subver(char subfs)
 		return 0;
 }
 
+#if defined (BOARD_XIAOMI_AX3000T)
+/*
+ * Add a small delta to a "aa:bb:cc:dd:ee:ff" style MAC address.
+ */
+static void
+mac_addr_add(const char *mac_in, int delta, char *mac_out, size_t mac_out_size)
+{
+	unsigned char ea[ETHER_ADDR_LEN];
+	unsigned int carry;
+	int i;
+
+	if (!ether_atoe(mac_in, ea)) {
+		snprintf(mac_out, mac_out_size, "%s", mac_in);
+		return;
+	}
+
+	carry = (unsigned int)delta;
+	for (i = ETHER_ADDR_LEN - 1; i >= 0 && carry; i--) {
+		unsigned int v = (unsigned int)ea[i] + (carry & 0xff);
+
+		ea[i] = (unsigned char)(v & 0xff);
+		carry = (carry >> 8) + (v >> 8);
+	}
+
+	ether_etoa(ea, mac_out);
+}
+
+/*
+ * Xiaomi Mi Router AX3000T keeps the Ethernet MACs as ASCII "ethaddr" /
+ * "ethaddr_wan" key/value pairs inside the "Bdata" partition; only the
+ * wifi base MAC lives in "Factory" at offset 0x4.  The wifi MACs are
+ * derived from the LAN MAC (2.4G = LAN + 1, 5G = LAN + 2), exactly like
+ * the stock firmware and OpenWrt/ImmortalWrt do it.
+ *
+ * Returns 1 if the Ethernet MACs could be taken from Bdata, 0 otherwise
+ * (in that case the Factory based defaults are kept).
+ */
+static int
+xiaomi_ax3000t_macs(char *macaddr_lan, size_t lan_size,
+		    char *macaddr_wan, size_t wan_size,
+		    char *macaddr_rt, size_t rt_size,
+		    char *macaddr_wl, size_t wl_size)
+{
+	unsigned char ea[ETHER_ADDR_LEN];
+	char kv[32];
+	char lan[18] = {0};
+	int have_lan = 0;
+
+	if (!flash_mtd_read_ascii_kv(MTD_PART_NAME_BDATA, "ethaddr", kv, sizeof(kv))
+	    && ether_atoe(kv, ea)) {
+		ether_etoa(ea, lan);
+		snprintf(macaddr_lan, lan_size, "%s", lan);
+		mac_addr_add(lan, 1, macaddr_rt, rt_size);
+		mac_addr_add(lan, 2, macaddr_wl, wl_size);
+		have_lan = 1;
+	}
+
+	if (!flash_mtd_read_ascii_kv(MTD_PART_NAME_BDATA, "ethaddr_wan", kv, sizeof(kv))
+	    && ether_atoe(kv, ea)) {
+		ether_etoa(ea, lan);
+		snprintf(macaddr_wan, wan_size, "%s", lan);
+		have_lan = have_lan ? 2 : 0;
+	}
+
+	return (have_lan == 2);
+}
+#endif
+
 /*
 void early_file_log(const char *fmt, ...) {
     FILE *f = fopen("/tmp/early_boot.log", "a");
@@ -234,6 +302,14 @@ get_eeprom_params(void)
 			ether_etoa(buffer, macaddr_wan);
 		}
 	}
+
+#if defined (BOARD_XIAOMI_AX3000T)
+	/* prefer the real MACs from the Xiaomi "Bdata" partition */
+	xiaomi_ax3000t_macs(macaddr_lan, sizeof(macaddr_lan),
+			    macaddr_wan, sizeof(macaddr_wan),
+			    macaddr_rt, sizeof(macaddr_rt),
+			    macaddr_wl, sizeof(macaddr_wl));
+#endif
 
 	nvram_set_temp("il0macaddr", macaddr_lan); // LAN
 	nvram_set_temp("il1macaddr", macaddr_wan); // WAN

@@ -37,6 +37,18 @@
 
 #define IFNAME_BR			"br0"
 
+#if defined (BOARD_XIAOMI_AX3000T)
+/*
+ * AX3000T has only one GMAC (GMAC0) which is the DSA conduit of the
+ * internal MT7531 switch.  GMAC0 shows up as "eth0", the four switch
+ * ports are the DSA user ports "wan" / "lan1" / "lan2" / "lan3", so
+ * there is no "eth1" on this board.
+ */
+#define IFNAME_MAC			"eth0"
+#define IFNAME_MAC2			"wan"
+#define IFNAME_LAN			IFNAME_MAC
+#define IFNAME_WAN			IFNAME_MAC2
+#else
 #define IFNAME_MAC			"eth0"
 #define IFNAME_MAC2			"eth1"
 
@@ -46,6 +58,7 @@
 #else
 #define IFNAME_LAN			IFNAME_MAC
 #define IFNAME_WAN			IFNAME_MAC2
+#endif
 #endif
 
 //#if defined(BOARD_RAX3000M)||defined(MT7981)

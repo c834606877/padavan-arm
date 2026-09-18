@@ -36,3 +36,5 @@ dtb-$(CONFIG_ARCH_MEDIATEK) += mt8516-pumpkin.dtb
 dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-cmcc-rax3000m.dtb
 dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-cmcc-rax3000m-emmc-ubootmod.dtb
 dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-cmcc-rax3000m-nand-ubootmod.dtb
+dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-xiaomi-ax3000t.dtb
+dtb-$(CONFIG_ARCH_MEDIATEK) += mt7981b-xiaomi-ax3000t-ubootmod.dtb
