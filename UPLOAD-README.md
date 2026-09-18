@@ -9,6 +9,26 @@
 
 ---
 
+## ⚠️ 先确认你要编哪个目标（这个坑已经踩过一次）
+
+固件名是 `sysupgrade_<CONFIG_BOARD_COMP>_<日期>_<rev>.bin`，**名字里的机型必须和你的设备一致**：
+
+| 名字里出现 | 对应机型 |
+| --- | --- |
+| `xiaomi_ax3000t-ubootmod` | 小米 AX3000T ✅ |
+| `cmcc_rax3000m-nand-ubootmod` | CMCC RAX3000M **NAND 版**（不是 AX3000T！） |
+| `cmcc_rax3000m-emmc-ubootmod` | CMCC RAX3000M **eMMC 版** |
+
+**上游自带的 CI 默认编 `QEMU RAX3000M RAX3000M-NAND`**，产物里会有三个固件，
+非常容易拿错（拿错的表现就是"刷完一直反复重启"，原因见 `README.AX3000T.md` 第 10 节）。
+本文件夹里的 `CI.yml` 已经把矩阵改成**只编 `AX3000T`**，请确保上传的是这一份。
+
+如果你其实也需要 RAX3000M-NAND：它的"启动不了"问题我这次一并修了
+（`RAX3000M-NAND.config` + 它的内核配置 + 它的 DTS 三处），
+把 `CI.yml` 里的 `targets: "AX3000T"` 改成 `targets: "AX3000T RAX3000M-NAND"` 即可两个都编。
+
+---
+
 ## 步骤
 
 ### 1. Fork 上游仓库

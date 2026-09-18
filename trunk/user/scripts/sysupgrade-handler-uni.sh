@@ -45,7 +45,7 @@ NAND_ROOT_PART="rootfs"      # raw NAND rootfs MTD partition
 # ubi_read_production in that U-Boot).  The squashfs rootfs is embedded in the
 # very same FIT as "ramdisk" sub-image, so no separate rootfs volume is used.
 case "$BOARD_NAME" in
-	xiaomi_ax3000t*)
+	xiaomi_ax3000t*|cmcc_rax3000m-nand*)
 		UBI_KERN_VOL="fit"
 		UBI_ROOT_VOL=""
 		;;

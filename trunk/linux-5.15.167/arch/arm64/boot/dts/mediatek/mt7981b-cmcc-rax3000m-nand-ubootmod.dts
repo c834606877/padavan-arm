@@ -10,6 +10,21 @@
 	aliases {
 		label-mac-device = &gmac1;
 	};
+
+	chosen {
+		/*
+		 * The RAX3000M NAND U-Boot boots the production image with
+		 * "ubi read $loadaddr fit && bootm $loadaddr#config-1" and its
+		 * environment does NOT define bootargs= (no root=), and this DTB
+		 * carries none either - so the kernel used to panic with
+		 * "VFS: Unable to mount root fs" and reboot in a loop
+		 * (CONFIG_PANIC_TIMEOUT=1).  The squashfs rootfs is embedded into
+		 * the FIT as "ramdisk" sub-image (CONFIG_FIRMWARE_FIT_WITH_ROOTFS),
+		 * so mount it from the ramdisk; "ubi.mtd=ubi" lets the kernel
+		 * attach UBI itself for padavan's /etc/storage.
+		 */
+		bootargs-append = " console=ttyS0,115200n1 earlycon=uart8250,mmio32,0x11002000 loglevel=8 root=/dev/ram0 rw rootfstype=squashfs ubi.mtd=ubi";
+	};
 };
 
 &gmac0 {

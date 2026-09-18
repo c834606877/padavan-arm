@@ -279,6 +279,28 @@ DTS 里交换芯片端口标签为 `wan` / `lan1` / `lan2` / `lan3`：
 * `IFNAME_WAN` 定义为 `"wan"`，即 WAN 直接就是那个 DSA 用户端口。
 * DSA conduit（GMAC0）保持 `eth0`，用不到 `eth1`。
 
+### 4.4 顺带修掉的同源问题：RAX3000M-NAND 编出来是**启动不了**的
+
+排查 AX3000T 的启动链路时发现，本仓库原有的 **RAX3000M-NAND** 机型存在同一类缺陷，
+表现为"刷完一直反复重启"：
+
+* 该板的 ubootmod U-Boot 环境里**没有 `bootargs=`**（不像 eMMC 版有 `root=/dev/fit0`），
+  而它的 DTS 也没有任何 `bootargs`；
+* 它的 FIT 里**只有 kernel + dtb**（没有 rootfs，因为模板没开 `CONFIG_FIRMWARE_FIT_WITH_ROOTFS`），
+  内核配置里 `CONFIG_BLK_DEV_RAM` 也是关的。
+
+三者叠加的结果：内核收到不到 `root=` → `VFS: Unable to mount root fs` panic →
+`CONFIG_PANIC_TIMEOUT=1` 立刻重启 → **无限重启**。已按与 AX3000T 相同的方案修好：
+
+| 文件 | 改动 |
+| --- | --- |
+| `trunk/configs/templates/RAX3000M-NAND.config` | 加 `CONFIG_FIRMWARE_FIT_WITH_ROOTFS=y`（rootfs 打进 FIT） |
+| `trunk/configs/boards/RAX3000M-NAND/kernel-5.15.167.config` | 打开 `CONFIG_BLK_DEV_RAM`（ramdisk 根文件系统） |
+| `.../mt7981b-cmcc-rax3000m-nand-ubootmod.dts` | 加 `chosen/bootargs-append = " … root=/dev/ram0 rw rootfstype=squashfs ubi.mtd=ubi"` |
+| `trunk/user/scripts/sysupgrade-handler-uni.sh` | 板级分支扩到 `xiaomi_ax3000t*\|cmcc_rax3000m-nand*`，WebUI 升级也写 UBI 卷 `fit` |
+
+（同样是**未编译、未真机验证**的改动；但因果链是在源码里逐条核对过的。）
+
 ---
 
 ## 5. 构建
@@ -570,3 +592,71 @@ MT7981> reset
 | MAC 来源（Bdata ASCII）与无线 MAC 推导 | `immortalwrt-mt798x-6.6/target/linux/mediatek/filogic/base-files/etc/board.d/02_network`（`mediatek_setup_macs`） |
 | 镜像/ARTIFACT 定义（DDR3、preloader/fip 命名） | `immortalwrt-mt798x-6.6/target/linux/mediatek/image/filogic.mk`（`Device/xiaomi_mi-router-ax3000t-ubootmod`） |
 | 原厂 NMBM 分区串（stock layout） | `immortalwrt-mt798x/target/linux/mediatek/mt7981/base-files/lib/upgrade/platform.sh` |
+
+---
+
+## 10. 排错速查（"刷完起不来"怎么定位）
+
+### 10.1 第一步永远是核对文件名里的目标
+
+镜像名格式是 `sysupgrade_<CONFIG_BOARD_COMP>_<日期>_<rev>.bin`：
+
+| 文件名里的关键字 | 对应机型 |
+| --- | --- |
+| `xiaomi_ax3000t-ubootmod` | ✅ 小米 AX3000T |
+| `cmcc_rax3000m-nand-ubootmod` | ⚠️ CMCC RAX3000M **NAND 版**（不是 AX3000T！） |
+| `cmcc_rax3000m-emmc-ubootmod` | ⚠️ CMCC RAX3000M **eMMC 版** |
+
+名字对不上就是**编错了目标**：`fakeroot ./build_firmware_modify <目标>` 的 `<目标>`，
+或者 CI 里 matrix 的 `targets`，必须是 `AX3000T`。
+（上游自带的 CI 默认编 `QEMU RAX3000M RAX3000M-NAND`，产物里会有三个固件，很容易拿错。）
+
+### 10.2 "一直反复重启" = 内核 panic 后被自动重启
+
+串口上会看到 `Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)`
+（或类似），大约 1 秒后就重启 —— 因为内核配置里是
+`CONFIG_PANIC_ON_OOPS=y` + `CONFIG_PANIC_TIMEOUT=1`。这不是 U-Boot 的问题，U-Boot 是好的。
+
+常见原因，按概率排序：
+
+1. **FIT 里没有 rootfs，而且没人传 `root=`**。自查两条：
+   * U-Boot 里 `printenv bootargs` —— 有没有 `root=`；
+   * `ubi part ubi ; ubi read $loadaddr fit ; iminfo $loadaddr` —— 输出的 images 列表里
+     有没有 `initrd-*`（有就说明 rootfs 在 FIT 里）。
+   本仓库的 RAX3000M-NAND 原来就属于这种，已在 4.4 修掉。
+2. **拿错机型的固件**（例如把 RAX3000M-NAND 的固件刷到 AX3000T 上）：DTB、分区表、
+   LED/GPIO 全都不对。见 10.1。
+3. **U-Boot 与内核的分区表不一致** → `ubi read fit` 读不到正确内容，见第 3 节开头。
+
+想看完整 panic 内容（1 秒就重启，日志看不清）：在 U-Boot 里用环境变量补 `panic=0`，
+我们的 `bootargs-append` 是**追加**在后面，不冲突：
+
+```
+MT7981> setenv bootargs 'console=ttyS0,115200n8 panic=0'
+MT7981> run boot_production
+```
+
+### 10.3 "一直进 U-Boot / 无限 TFTP 重试"
+
+那是 `boot_tftp_forever` 兜底（`boot_production` 失败后的行为），见 3.4 与 3.5。
+
+### 10.4 怎么从重启循环里救回来
+
+内核 panic 循环**不会影响 U-Boot 本身**，所以每一轮都会重新进 U-Boot：
+
+1. 接好串口，上电后**狂按任意键**（或进菜单选 `0. U-Boot console`）就能停下来。
+2. 看状态：`ubi part ubi` → `ubi check fit` → `ubi read $loadaddr fit` → `iminfo $loadaddr`。
+3. 用 TFTP 写一份**正确的**固件进去：
+
+```
+MT7981> setenv serverip <你主机的 IP>
+MT7981> setenv bootfile fit_xiaomi_ax3000t-ubootmod_<日期>_<rev>.itb
+MT7981> tftpboot $loadaddr $bootfile
+MT7981> ubi remove fit ; ubi create fit $filesize dynamic && ubi write $loadaddr fit $filesize
+MT7981> reset
+```
+
+4. 想彻底回到官方固件：把 ImmortalWrt/OpenWrt 的
+   `...-xiaomi_mi-router-ax3000t-ubootmod-squashfs-sysupgrade.itb` 写进**同一个 `fit` 卷**即可
+   （它们的 U-Boot 用 `root=/dev/fit0` 引导，与你刷进去的镜像配套）。
+
