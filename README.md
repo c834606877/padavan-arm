@@ -31,6 +31,8 @@ The project is under active development. Key milestones achieved:
   - [x] `5Ghz` works, All bandwidth works `20Mhz` `40Mhz` `80Mhz` `160Mhz`
   - [x] User/Psw  Settings is works.
   - [ ] `Other Settings from WebUI is ongoing.`
+  - [ ] Wi-Fi repeater is under development.
+- [ ] DLNA is under development.
 - [x] **Features**: CAKE/QoS with TC.
 - [x] *NVRAM*: Works.
 - [x] *USB*: Works.
@@ -226,5 +228,3 @@ __Inctroduced Path__
 
 
 *Disclaimer: This is an experimental porting version by Lan Bing. Use at your own risk.*
-
-

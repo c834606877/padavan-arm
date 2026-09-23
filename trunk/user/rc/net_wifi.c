@@ -481,7 +481,8 @@ start_wifi_ap_wl(int radio_on)
 		}
 	}
 
-        eval("/usr/bin/hostapd.sh","start_wl");
+	if (radio_on && i_mode_x != 1 && i_mode_x != 3)
+		eval("/usr/bin/hostapd.sh","start_wl");
 
 #endif
 }
@@ -541,7 +542,8 @@ start_wifi_ap_rt(int radio_on)
 		}
 	}
 #endif
-        eval("/usr/bin/hostapd.sh","start_rt");
+	if (radio_on && i_mode_x != 1 && i_mode_x != 3)
+		eval("/usr/bin/hostapd.sh","start_rt");
 }
 
 void
@@ -1495,4 +1497,3 @@ timecheck_wifi(int is_aband, const char *nv_date, const char *nv_time1, const ch
 
 	return 0;
 }
-

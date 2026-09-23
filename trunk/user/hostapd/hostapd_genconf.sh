@@ -115,14 +115,30 @@ EOF
 vht_oper_chwidth=1
 vht_oper_centr_freq_seg0_idx=${center_freq:-42}
 EOF
+                # hostapd uses he_oper_* instead of vht_oper_* when HE is enabled.
+                if [ "${gmode:-4}" -ge 5 ]; then
+                    cat <<EOF >> "$conf_file"
+he_oper_chwidth=1
+he_oper_centr_freq_seg0_idx=${center_freq:-42}
+EOF
+                fi
             elif [ "$ht_bw" = "3" ]; then
                 local center_freq=$(calculate_center_freq "$channel" "3")
                 cat <<EOF >> "$conf_file"
 vht_oper_chwidth=2
 vht_oper_centr_freq_seg0_idx=${center_freq:-50}
 EOF
+                if [ "${gmode:-4}" -ge 5 ]; then
+                    cat <<EOF >> "$conf_file"
+he_oper_chwidth=2
+he_oper_centr_freq_seg0_idx=${center_freq:-50}
+EOF
+                fi
             else
                 echo "vht_oper_chwidth=0" >> "$conf_file"
+                if [ "${gmode:-4}" -ge 5 ]; then
+                    echo "he_oper_chwidth=0" >> "$conf_file"
+                fi
             fi
         fi
     fi
@@ -219,4 +235,3 @@ EOF
 # --- Trigger the configuration generation logic ---
 generate_hostapd_conf "wlan0" "rt_"
 generate_hostapd_conf "wlan1" "wl_"
-

@@ -228,7 +228,7 @@ dir_y 						+= nftables
 #
 all:  $(addprefix comp_,$(dir_y))
 
-PRIORITY_DIRS = shared libdisk wireless_tools iptables
+PRIORITY_DIRS = shared libdisk wireless_tools iptables util-linux busybox
 NORMAL_DIRS = $(filter-out $(PRIORITY_DIRS), $(dir_y))
 
 PRIORITY_TARGETS = $(addprefix comp_,$(PRIORITY_DIRS))

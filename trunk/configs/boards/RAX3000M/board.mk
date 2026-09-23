@@ -4,7 +4,7 @@
 # K2P       # K2P              # MT7621  #
 ##################################################################
 
-CFLAGS += -DBOARD_RAX3000M -DBOARD_MT7615_DBDC
+CFLAGS += -DBOARD_RAX3000M -DBOARD_MT7915_DBDC
 BOARD_NUM_USB_PORTS=1
 CONFIG_BOARD_RAM_SIZE=128
 
