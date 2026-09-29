@@ -70,12 +70,18 @@ static const struct ifname_desc_t {
 	{ IFNAME_2G_MAIN,    IFDESC_WLAN2_AP0, 0, 0, 0, 0 },
 	{ IFNAME_2G_GUEST,   IFDESC_WLAN2_AP1, 0, 0, 0, 0 },
 	{ IFNAME_2G_APCLI,   IFDESC_WLAN2_APC, 0, 0, 0, 2 },
+#if defined (BOARD_MT7915_DBDC)
+	{ IFNAME_2G_STA,     IFDESC_WLAN2_APC, 0, 0, 0, 2 },
+#endif
 	{ IFNAME_2G_WDS0,    IFDESC_WLAN2_WDS, 0, 0, 0, 0 },
 #endif
 #if BOARD_HAS_5G_RADIO
 	{ IFNAME_5G_MAIN,    IFDESC_WLAN5_AP0, 0, 0, 0, 0 },
 	{ IFNAME_5G_GUEST,   IFDESC_WLAN5_AP1, 0, 0, 0, 0 },
 	{ IFNAME_5G_APCLI,   IFDESC_WLAN5_APC, 0, 0, 0, 2 },
+#if defined (BOARD_MT7915_DBDC)
+	{ IFNAME_5G_STA,     IFDESC_WLAN5_APC, 0, 0, 0, 2 },
+#endif
 	{ IFNAME_5G_WDS0,    IFDESC_WLAN5_WDS, 0, 0, 0, 0 },
 #endif
 #if defined(USE_USB_SUPPORT)
@@ -217,8 +223,14 @@ int
 is_man_wisp(const char *ifname)
 {
 	if (strcmp(ifname, IFNAME_2G_APCLI) == 0
+#if defined (BOARD_MT7915_DBDC)
+		 || strcmp(ifname, IFNAME_2G_STA) == 0
+#endif
 #if BOARD_HAS_5G_RADIO
 	 || strcmp(ifname, IFNAME_5G_APCLI) == 0
+#if defined (BOARD_MT7915_DBDC)
+		 || strcmp(ifname, IFNAME_5G_STA) == 0
+#endif
 #endif
 	   )
 		return 1;
@@ -912,5 +924,4 @@ char *get_ifaddr6(const char *ifname, int linklocal, char *p_addr6s)
 }
 #endif
 #endif
-
 

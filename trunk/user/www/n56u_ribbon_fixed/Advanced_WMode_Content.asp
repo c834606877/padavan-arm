@@ -33,14 +33,6 @@ function initial(){
 	insertChannelOption();
 	document.form.wl_channel.remove(0);
 
-	if (typeof(support_5g_wid) === 'function'){
-		wid = support_5g_wid();
-		if (wid==7915 || wid ==7615){
-			document.form.wl_mode_x.remove(1);
-			document.form.wl_mode_x.remove(1);
-		}
-	}
-
 	showLANIPList();
 
 	change_wireless_bridge();
@@ -190,7 +182,8 @@ function setClientIP(num){
 		document.form.wl_wdslist_x_0.value = smac[0] + smac[1] + smac[2] + smac[3] + smac[4] + smac[5];
 	else if (mode == "3" || mode == "4")
 		document.form.wl_sta_ssid.value = wds_aplist[num][0];
-	if (parseInt(wds_aplist[num][2]) > 0)
+	if (document.form.wl_sta_auto.value == "1" &&
+	    parseInt(wds_aplist[num][2]) > 0)
 		document.form.wl_channel.value = wds_aplist[num][2];
 	hideClients_Block();
 }
@@ -332,9 +325,7 @@ function hideClients_Block(){
                                             <td style="border-top: 0 none;">
                                                 <select name="wl_mode_x" class="input" onChange="change_wireless_bridge();">
                                                     <option value="0" <% nvram_match_x("","wl_mode_x", "0","selected"); %>><#WdsMode0#></option>
-                                                    <option value="1" <% nvram_match_x("","wl_mode_x", "1","selected"); %>><#WdsMode1#></option>
-                                                    <option value="2" <% nvram_match_x("","wl_mode_x", "2","selected"); %>><#WdsMode2#></option>
-                                                    <option value="3" <% nvram_match_x("","wl_mode_x", "3","selected"); %>><#WdsMode3#></option>
+                                                    <option value="3" <% nvram_match_x("","wl_mode_x", "3","selected"); %>><#WdsMode3#></option>
                                                     <option value="4" <% nvram_match_x("","wl_mode_x", "4","selected"); %>><#WdsMode4#></option>
                                                 </select>
                                             </td>

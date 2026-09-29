@@ -183,13 +183,13 @@ get_apcli_wisp_ifname(void)
 	i_mode_x = get_mode_radio_rt();
 	if (get_enabled_radio_rt() && (i_mode_x == 3 || i_mode_x == 4) && is_apcli_wisp_rt() &&
 	   (strlen(nvram_wlan_get(0, "sta_ssid")) > 0))
-		return IFNAME_2G_APCLI;
+		return IFNAME_2G_WISP;
 #endif
 #if BOARD_HAS_5G_RADIO
 	i_mode_x = get_mode_radio_wl();
 	if (get_enabled_radio_wl() && (i_mode_x == 3 || i_mode_x == 4) && is_apcli_wisp_wl() &&
 	   (strlen(nvram_wlan_get(1, "sta_ssid")) > 0))
-		return IFNAME_5G_APCLI;
+		return IFNAME_5G_WISP;
 #endif
 	return NULL;
 }
@@ -207,20 +207,20 @@ check_apcli_wan(int is_5g, int radio_on)
 
 	man_id = -1;
 	man_ifname = get_man_ifname(0);
-	if (strcmp(man_ifname, IFNAME_2G_APCLI) == 0)
+	if (strcmp(man_ifname, IFNAME_2G_WISP) == 0)
 		man_id = 0;
 #if BOARD_HAS_5G_RADIO
-	else if (strcmp(man_ifname, IFNAME_5G_APCLI) == 0)
+	else if (strcmp(man_ifname, IFNAME_5G_WISP) == 0)
 		man_id = 1;
 #endif
 
 	wisp_id = -1;
 	wisp_ifname = get_apcli_wisp_ifname();
 	if (wisp_ifname) {
-		if (strcmp(wisp_ifname, IFNAME_2G_APCLI) == 0)
+		if (strcmp(wisp_ifname, IFNAME_2G_WISP) == 0)
 			wisp_id = 0;
 #if BOARD_HAS_5G_RADIO
-		else if (strcmp(wisp_ifname, IFNAME_5G_APCLI) == 0)
+		else if (strcmp(wisp_ifname, IFNAME_5G_WISP) == 0)
 			wisp_id = 1;
 #endif
 	}
@@ -379,10 +379,13 @@ update_vga_clamp_rt(int first_call)
 #endif
 }
 
-void 
+void
 stop_wifi_all_wl(void)
 {
 	eval("/usr/bin/hostapd.sh","stop_wl");
+#if defined (BOARD_MT7915_DBDC)
+	eval("/usr/bin/wpa_supplicant.sh", "stop_wl");
+#endif
 
 #if BOARD_HAS_5G_RADIO
 	// stop ApCli
@@ -406,6 +409,9 @@ void
 stop_wifi_all_rt(void)
 {
 	eval("/usr/bin/hostapd.sh","stop_rt");
+#if defined (BOARD_MT7915_DBDC)
+	eval("/usr/bin/wpa_supplicant.sh", "stop_rt");
+#endif
 #if defined(USE_RT3352_MII)
 	stop_inicd();
 	
@@ -481,7 +487,7 @@ start_wifi_ap_wl(int radio_on)
 		}
 	}
 
-	if (radio_on && i_mode_x != 1 && i_mode_x != 3)
+	if (radio_on && i_mode_x != 1 && i_mode_x != 3 && i_mode_x != 4)
 		eval("/usr/bin/hostapd.sh","start_wl");
 
 #endif
@@ -542,7 +548,7 @@ start_wifi_ap_rt(int radio_on)
 		}
 	}
 #endif
-	if (radio_on && i_mode_x != 1 && i_mode_x != 3)
+	if (radio_on && i_mode_x != 1 && i_mode_x != 3 && i_mode_x != 4)
 		eval("/usr/bin/hostapd.sh","start_rt");
 }
 
@@ -643,6 +649,23 @@ start_wifi_apcli_wl(int radio_on)
 	const char *ifname_apcli = IFNAME_5G_APCLI;
 	int i_mode_x = get_mode_radio_wl();
 
+#if defined (BOARD_MT7915_DBDC)
+	if (radio_on && i_mode_x == 4)
+		eval("/usr/bin/wpa_supplicant.sh", "start_wl");
+	else if (radio_on && i_mode_x == 3 &&
+		 strlen(nvram_wlan_get(1, "sta_ssid")) > 0)
+		eval("/usr/bin/wpa_supplicant.sh", "start_wl");
+	else {
+		br_add_del_if(IFNAME_BR, IFNAME_5G_STA, 0);
+		eval("/usr/bin/wpa_supplicant.sh", "stop_wl");
+	}
+	if (radio_on && (i_mode_x == 3 || i_mode_x == 4) &&
+	    strlen(nvram_wlan_get(1, "sta_ssid")) > 0)
+		br_add_del_if(IFNAME_BR, IFNAME_5G_STA,
+			!is_apcli_wisp_wl() || get_ap_mode());
+	return;
+#endif
+
 	if (radio_on && (i_mode_x == 3 || i_mode_x == 4) && (strlen(nvram_wlan_get(1, "sta_ssid")) > 0))
 	{
 		wif_control(ifname_apcli, 1);
@@ -672,6 +695,23 @@ start_wifi_apcli_rt(int radio_on)
 {
 	const char *ifname_apcli = IFNAME_2G_APCLI;
 	int i_mode_x = get_mode_radio_rt();
+
+#if defined (BOARD_MT7915_DBDC)
+	if (radio_on && i_mode_x == 4)
+		eval("/usr/bin/wpa_supplicant.sh", "start_rt");
+	else if (radio_on && i_mode_x == 3 &&
+		 strlen(nvram_wlan_get(0, "sta_ssid")) > 0)
+		eval("/usr/bin/wpa_supplicant.sh", "start_rt");
+	else {
+		br_add_del_if(IFNAME_BR, IFNAME_2G_STA, 0);
+		eval("/usr/bin/wpa_supplicant.sh", "stop_rt");
+	}
+	if (radio_on && (i_mode_x == 3 || i_mode_x == 4) &&
+	    strlen(nvram_wlan_get(0, "sta_ssid")) > 0)
+		br_add_del_if(IFNAME_BR, IFNAME_2G_STA,
+			!is_apcli_wisp_rt() || get_ap_mode());
+	return;
+#endif
 
 	if (radio_on && (i_mode_x == 3 || i_mode_x == 4) && (strlen(nvram_wlan_get(0, "sta_ssid")) > 0))
 	{
@@ -705,6 +745,15 @@ reconnect_apcli(const char *ifname_apcli, int force)
 {
 	int is_aband, i_mode_x;
 
+#if defined (BOARD_MT7915_DBDC)
+	if (strcmp(ifname_apcli, IFNAME_2G_STA) == 0)
+		is_aband = 0;
+#if BOARD_HAS_5G_RADIO
+	else if (strcmp(ifname_apcli, IFNAME_5G_STA) == 0)
+		is_aband = 1;
+#endif
+	else
+#endif
 	if (strcmp(ifname_apcli, IFNAME_2G_APCLI) == 0)
 		is_aband = 0;
 #if BOARD_HAS_5G_RADIO
@@ -713,6 +762,15 @@ reconnect_apcli(const char *ifname_apcli, int force)
 #endif
 	else
 		return;
+
+#if defined (BOARD_MT7915_DBDC)
+	if ((is_aband && strcmp(ifname_apcli, IFNAME_5G_STA) == 0) ||
+	    (!is_aband && strcmp(ifname_apcli, IFNAME_2G_STA) == 0)) {
+		if (force)
+			doSystem("wpa_cli -p /var/run/wpa_supplicant -i %s reconnect", ifname_apcli);
+		return;
+	}
+#endif
 
 	if (!is_interface_up(ifname_apcli))
 		return;
@@ -906,6 +964,9 @@ is_radio_on_wl(void)
 	return is_interface_up(IFNAME_5G_MAIN) ||
 	       is_interface_up(IFNAME_5G_GUEST) ||
 	       is_interface_up(IFNAME_5G_APCLI) ||
+#if defined (BOARD_MT7915_DBDC)
+	       is_interface_up(IFNAME_5G_STA) ||
+#endif
 	       is_interface_up(IFNAME_5G_WDS0) ||
 	       is_interface_up(IFNAME_5G_WDS1) ||
 	       is_interface_up(IFNAME_5G_WDS2) ||
@@ -925,6 +986,9 @@ is_radio_on_rt(void)
 	return is_interface_up(IFNAME_2G_MAIN) ||
 	       is_interface_up(IFNAME_2G_GUEST) ||
 	       is_interface_up(IFNAME_2G_APCLI) ||
+#if defined (BOARD_MT7915_DBDC)
+	       is_interface_up(IFNAME_2G_STA) ||
+#endif
 	       is_interface_up(IFNAME_2G_WDS0) ||
 	       is_interface_up(IFNAME_2G_WDS1) ||
 	       is_interface_up(IFNAME_2G_WDS2) ||

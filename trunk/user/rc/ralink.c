@@ -1681,6 +1681,28 @@ get_apcli_connected(const char *ifname)
 {
 	struct iwreq wrq;
 
+#if defined (BOARD_MT7915_DBDC)
+	if (strcmp(ifname, IFNAME_2G_STA) == 0 || strcmp(ifname, IFNAME_5G_STA) == 0) {
+		FILE *fp;
+		char buf[128], cmd[128];
+
+		snprintf(cmd, sizeof(cmd),
+			  "wpa_cli -p /var/run/wpa_supplicant -i %s status 2>/dev/null",
+			  ifname);
+		fp = popen(cmd, "r");
+		if (fp) {
+			while (fgets(buf, sizeof(buf), fp)) {
+				if (strstr(buf, "wpa_state=COMPLETED")) {
+					pclose(fp);
+					return 1;
+				}
+			}
+			pclose(fp);
+		}
+		return 0;
+	}
+#endif
+
 	memset(&wrq, 0, sizeof(struct iwreq));
 	wrq.u.ap_addr.sa_family = ARPHRD_ETHER;
 
@@ -1696,4 +1718,3 @@ get_apcli_connected(const char *ifname)
 
 	return 0;
 }
-

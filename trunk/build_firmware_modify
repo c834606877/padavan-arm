@@ -184,6 +184,7 @@ make dep
 echo --------------------------MAKE-ALL--------------------------------
 make
 #make user/openssh_only
+#make user/wap_supplicant_only
 #make tools linux
 #make subdirs
 #make ebtables

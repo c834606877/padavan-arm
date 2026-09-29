@@ -34,10 +34,24 @@ generate_hostapd_conf() {
     local wpa_key=$(nvram get "${prefix}wpa_psk")
     local auth_mode=$(nvram get "${prefix}auth_mode")
     local channel=$(nvram get "${prefix}channel")
+    local sta_auto=$(nvram get "${prefix}sta_auto")
     local closed=$(nvram get "${prefix}closed")
     
     # Fetch wireless regulatory country code from Padavan NVRAM (e.g., US, CN)
     local country=$(nvram get "${prefix}country_code")
+
+    # WISP STA may discover a new upstream channel at runtime.
+    if [ "$sta_auto" = "1" ] && [ -r "/var/run/hostapd/${prefix}channel" ]; then
+        channel=$(cat "/var/run/hostapd/${prefix}channel")
+    fi
+
+    if [ -z "$channel" ] || [ "$channel" = "0" ]; then
+        if [ "$ifname" = "wlan1" ]; then
+            channel=36
+        else
+            channel=6
+        fi
+    fi
 
     # Read bandwidth and protocol standard settings
     local ht_bw=$(nvram get "${prefix}HT_BW")     # 0=20M, 1=40M, 2=80M, 3=160M
@@ -76,6 +90,7 @@ EOF
     # 2. Inject 802.11ac (VHT) and 802.11ax (HE) high-throughput extensions
     if [ "$ifname" = "wlan1" ]; then
         # Default HT40+ configuration for 5G setup to fix "mode (1)" constraint
+        echo "ieee80211h=1" >> "$conf_file"
         echo "ht_capab=[HT40+][SHORT-GI-20][SHORT-GI-40]" >> "$conf_file"
     else
         # Add HT capabilities for 2.4G (wlan0)

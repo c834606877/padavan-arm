@@ -39,17 +39,6 @@ function initial(){
 	insertChannelOption();
 	document.form.rt_channel.remove(0);
 
-	if (support_2g_inic_mii())
-		document.form.rt_mode_x.remove(3);
-
- 	if (typeof(support_2g_wid) === 'function'){
-		wid = support_2g_wid();
-		if (wid==7915 || wid==7615){
-			document.form.rt_mode_x.remove(1);
-			document.form.rt_mode_x.remove(1);
-		}
-	}
-
 	showLANIPList();
 
 	change_wireless_bridge();
@@ -200,7 +189,8 @@ function setClientIP(num){
 		document.form.rt_wdslist_x_0.value = smac[0] + smac[1] + smac[2] + smac[3] + smac[4] + smac[5];
 	else if (mode == "3" || mode == "4")
 		document.form.rt_sta_ssid.value = wds_aplist[num][0];
-	if (parseInt(wds_aplist[num][2]) > 0)
+	if (document.form.rt_sta_auto.value == "1" &&
+	    parseInt(wds_aplist[num][2]) > 0)
 		document.form.rt_channel.value = wds_aplist[num][2];
 	hideClients_Block();
 }
@@ -342,9 +332,7 @@ function hideClients_Block(){
                                             <td style="border-top: 0 none;">
                                                 <select name="rt_mode_x" class="input" onChange="change_wireless_bridge();">
                                                     <option value="0" <% nvram_match_x("","rt_mode_x", "0","selected"); %>><#WdsMode0#></option>
-                                                    <option value="1" <% nvram_match_x("","rt_mode_x", "1","selected"); %>><#WdsMode1#></option>
-                                                    <option value="2" <% nvram_match_x("","rt_mode_x", "2","selected"); %>><#WdsMode2#></option>
-                                                    <option value="3" <% nvram_match_x("","rt_mode_x", "3","selected"); %>><#WdsMode3#></option>
+                                                    <option value="3" <% nvram_match_x("","rt_mode_x", "3","selected"); %>><#WdsMode3#></option>
                                                     <option value="4" <% nvram_match_x("","rt_mode_x", "4","selected"); %>><#WdsMode4#></option>
                                                 </select>
                                             </td>

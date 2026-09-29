@@ -1,4 +1,5 @@
 SRC_NAME=wpa_supplicant
+THISDIR = $(shell pwd)
 
 
 all:
@@ -21,3 +22,5 @@ clean:
 romfs:
 	$(ROMFSINST) $(SRC_NAME)/wpa_cli /usr/sbin/wpa_cli
 	$(ROMFSINST) $(SRC_NAME)/wpa_supplicant /usr/sbin/wpa_supplicant
+	$(ROMFSINST) -p +x $(THISDIR)/wpa_supplicant_genconf.sh /usr/bin/wpa_supplicant_genconf.sh
+	$(ROMFSINST) -p +x $(THISDIR)/wpa_supplicant.sh /usr/bin/wpa_supplicant.sh

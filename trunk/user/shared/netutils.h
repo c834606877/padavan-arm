@@ -64,6 +64,9 @@
 #define IFNAME_2G_MAIN			"rax0"
 #define IFNAME_2G_GUEST			"rax1"
 #define IFNAME_2G_APCLI			"apclix0"
+#if defined (BOARD_MT7915_DBDC)
+#define IFNAME_2G_STA			"wlan0-sta"
+#endif
 #else
 #define IFNAME_2G_MAIN			"ra0"
 #define IFNAME_2G_GUEST			"ra1"
@@ -99,15 +102,32 @@
 #define IFNAME_5G_MAIN			"ra0"
 #define IFNAME_5G_GUEST			"ra1"
 #define IFNAME_5G_APCLI			"apcli0"
+#if defined (BOARD_MT7915_DBDC)
+#define IFNAME_5G_STA			"wlan1-sta"
+#endif
 #else
 #define IFNAME_5G_MAIN			"rai0"
 #define IFNAME_5G_GUEST			"rai1"
 #define IFNAME_5G_APCLI			"apclii0"
 #endif
+
 #define IFNAME_5G_WDS0			"wdsi0"
 #define IFNAME_5G_WDS1			"wdsi1"
 #define IFNAME_5G_WDS2			"wdsi2"
 #define IFNAME_5G_WDS3			"wdsi3"
+#endif
+
+#endif
+
+#if defined (BOARD_MT7915_DBDC)
+#define IFNAME_2G_WISP			IFNAME_2G_STA
+#if BOARD_HAS_5G_RADIO
+#define IFNAME_5G_WISP			IFNAME_5G_STA
+#endif
+#else
+#define IFNAME_2G_WISP			IFNAME_2G_APCLI
+#if BOARD_HAS_5G_RADIO
+#define IFNAME_5G_WISP			IFNAME_5G_APCLI
 #endif
 #endif
 

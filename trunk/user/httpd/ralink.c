@@ -1644,6 +1644,7 @@ ej_wl_auth_list(int eid, webs_t wp, int argc, char **argv)
 }
 
 
+#if 0
 #define SSURV_LINE_LEN		(4+33+20+23+9+12+7+3)		// Channel+SSID+Bssid+Security+Signal+WiressMode+ExtCh+NetworkType
 #define SSURV_LINE_LEN_WPS	(4+33+20+23+9+7+7+3+4+5)	// Channel+SSID+Bssid+Security+Signal+WiressMode+ExtCh+NetworkType+WPS+PIN
 
@@ -1881,6 +1882,8 @@ ej_wl_scan_2g(int eid, webs_t wp, int argc, char **argv)
 	return retval;
 }
 
+#endif
+
 #if BOARD_HAS_5G_RADIO
 int
 ej_wl_bssid_5g(int eid, webs_t wp, int argc, char **argv)
@@ -1926,4 +1929,3 @@ ej_wl_bssid_2g(int eid, webs_t wp, int argc, char **argv)
 
 	return 0;
 }
-
