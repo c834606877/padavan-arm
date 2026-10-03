@@ -70,6 +70,7 @@ generate_conf()
 	local channel
 	local frequency
 	local sta_auto
+	local mode_x
 
 	case "$ifname:$prefix" in
 		wlan0-sta:rt_|wlan1-sta:wl_) ;;
@@ -88,6 +89,7 @@ generate_conf()
 	bssid="$(nvram get "${prefix}sta_bssid")"
 	channel="$(nvram get "${prefix}channel")"
 	sta_auto="$(nvram get "${prefix}sta_auto")"
+	mode_x="$(nvram get "${prefix}mode_x")"
 
 	[ -n "$ssid" ] || {
 		rm -f "$conf_file" "$tmp_file"
@@ -122,6 +124,10 @@ generate_conf()
 			*) echo "invalid BSSID for $ifname" >&2; return 1 ;;
 		esac
 		printf 'scan_ssid=1\n'
+		if [ "$mode_x" = "4" ]; then
+			# Let the WISP monitor align hostapd before association on the same PHY.
+			printf 'disabled=1\n'
+		fi
 
 		if [ "$auth_mode" = "open" ] || [ -z "$psk" ]; then
 			printf 'key_mgmt=NONE\n'

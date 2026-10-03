@@ -21,8 +21,12 @@
 #include <errno.h>
 #include <time.h>
 #include <netinet/in.h>
+#include <unistd.h>
 
 #include "rc.h"
+
+#define WAN_WPA_PID_FILE      "/var/run/wpa_supplicant-wan.pid"
+#define WAN_WPA_CLI_PID_FILE  "/var/run/wpa_cli-wan.pid"
 
 void stop_auth_kabinet(void)
 {
@@ -56,8 +60,11 @@ int start_auth_kabinet(void)
 
 void stop_auth_eapol(void)
 {
-	char *svcs[] = { "wpa_cli", "wpa_supplicant",  NULL };
-	kill_services(svcs, 3, 1);
+	kill_process_pidfile(WAN_WPA_CLI_PID_FILE, 3, 1);
+	kill_process_pidfile(WAN_WPA_PID_FILE, 3, 1);
+
+	unlink(WAN_WPA_CLI_PID_FILE);
+	unlink(WAN_WPA_PID_FILE);
 }
 
 int start_auth_eapol(char *ifname, int unit, int eap_algo)
@@ -69,6 +76,7 @@ int start_auth_eapol(char *ifname, int unit, int eap_algo)
 	char *log_prefix = "EAPoL-MD5";
 	char *wpa_argv[] = {"/usr/sbin/wpa_supplicant",
 		"-B", "-W",
+		"-P", WAN_WPA_PID_FILE,
 		"-D", "wired",
 		"-i", ifname,
 		"-c", (char *)wpa_conf,
@@ -77,6 +85,7 @@ int start_auth_eapol(char *ifname, int unit, int eap_algo)
 
 	char *cli_argv[] = {"/usr/sbin/wpa_cli",
 		"-B",
+		"-P", WAN_WPA_CLI_PID_FILE,
 		"-i", ifname,
 		"-a", SCRIPT_WPACLI_WAN,
 		NULL
@@ -170,4 +179,3 @@ int wpacli_main(int argc, char **argv)
 
 	return 0;
 }
-

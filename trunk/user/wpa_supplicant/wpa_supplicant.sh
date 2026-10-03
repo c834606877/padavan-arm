@@ -1,18 +1,5 @@
 #!/bin/sh
 
-SCRIPT_LOG="/tmp/wpa-supplicant-script.log"
-: >> "$SCRIPT_LOG"
-exec 2>> "$SCRIPT_LOG"
-PS4='+ wpa_supplicant.sh pid=$$ time=$(date +%s) '
-set -x
-
-script_log()
-{
-	printf '%s wpa_supplicant.sh pid=%s: %s\n' "$(date +%s)" "$$" "$*" >> "$SCRIPT_LOG"
-}
-
-script_log "invoked: $0 $*"
-
 CONF_DIR="/var/run/wpa_supplicant"
 PID_DIR="/var/run"
 
@@ -153,6 +140,55 @@ frequency_to_channel()
 	esac
 }
 
+scan_frequency()
+{
+	local sta="$1"
+	local target_ssid="$2"
+
+	wpa_cli -p "$CONF_DIR" -i "$sta" scan_results 2>/dev/null |
+	while IFS="$(printf '\t')" read -r bssid freq signal flags ssid; do
+		case "$bssid" in
+			''|bssid) continue ;;
+		esac
+		if [ "$ssid" = "$target_ssid" ]; then
+			printf '%s\n' "$freq"
+			return 0
+		fi
+	done
+}
+
+set_wisp_channel()
+{
+	local radio="$1"
+	local prefix="$2"
+	local sta="$3"
+	local freq="$4"
+	local log_file="$5"
+	local channel
+	local current
+	local channel_file
+	local tmp_file
+
+	channel="$(frequency_to_channel "$freq")" || channel=""
+	printf '%s %s: scan frequency=%s mapped channel=%s\n' \
+		"$(date +%s)" "$sta" "$freq" "${channel:-INVALID}" >> "$log_file"
+	[ -n "$channel" ] || return 1
+
+	channel_file="$(runtime_channel_file "$radio")"
+	current="$(cat "$channel_file" 2>/dev/null)"
+	[ -n "$current" ] || current="$(nvram get "${prefix}channel")"
+	[ "$channel" = "$current" ] && return 0
+
+	printf '%s %s: channel change %s -> %s, restarting hostapd\n' \
+		"$(date +%s)" "$sta" "${current:-NONE}" "$channel" >> "$log_file"
+	tmp_file="${channel_file}.tmp.$$"
+	mkdir -p "$(dirname "$channel_file")"
+	printf '%s\n' "$channel" > "$tmp_file" && mv -f "$tmp_file" "$channel_file"
+	logger -t wpa_supplicant "${sta}: upstream frequency ${freq}, channel ${channel}; restarting hostapd"
+	/usr/bin/hostapd.sh "restart_$radio" \
+		>>"/tmp/hostapd-wisp-$sta.log" 2>&1
+}
+
 sync_wisp_hostapd()
 {
 	local radio="$1"
@@ -162,43 +198,56 @@ sync_wisp_hostapd()
 	local status
 	local state
 	local freq
-	local channel
-	local current
-	local channel_file
-	local tmp_file
+	local target_ssid
+	local scan_freq
+	local scan_requested=0
+	local network_enabled=0
+	local scan_wait=0
 
 	sta="$(sta_ifname "$radio")" || return 1
 	log_file="/tmp/hostapd-wisp-$sta.log"
-	channel_file="$(runtime_channel_file "$radio")"
+	target_ssid="$(nvram get "${prefix}sta_ssid")"
 
 	while [ -r "$(monitor_pidfile "$radio")" ]; do
 		status="$(wpa_cli -p "$CONF_DIR" -i "$sta" status 2>/dev/null)"
 		state="$(printf '%s\n' "$status" | sed -n 's/^wpa_state=//p')"
 		freq="$(printf '%s\n' "$status" | sed -n 's/^freq=//p')"
-		printf '%s %s: scan monitor state=%s freq=%s\n' \
-			"$(date +%s)" "$sta" "${state:-UNKNOWN}" "${freq:-NONE}" >> "$log_file"
 
-		if [ "$state" = "COMPLETED" ] && [ -n "$freq" ]; then
-			channel="$(frequency_to_channel "$freq")" || channel=""
-			printf '%s %s: scan monitor mapped freq=%s to channel=%s\n' \
-				"$(date +%s)" "$sta" "$freq" "${channel:-INVALID}" >> "$log_file"
-			if [ -n "$channel" ]; then
-				current="$(cat "$channel_file" 2>/dev/null)"
-				[ -n "$current" ] || current="$(nvram get "${prefix}channel")"
-				if [ "$channel" != "$current" ]; then
-					printf '%s %s: channel change %s -> %s, restarting hostapd\n' \
-						"$(date +%s)" "$sta" "${current:-NONE}" "$channel" >> "$log_file"
-					tmp_file="${channel_file}.tmp.$$"
-					mkdir -p "$(dirname "$channel_file")"
-					printf '%s\n' "$channel" > "$tmp_file" &&
-						mv -f "$tmp_file" "$channel_file"
-					logger -t wpa_supplicant "${sta}: upstream frequency ${freq}, channel ${channel}; restarting hostapd"
-					/usr/bin/hostapd.sh "restart_$radio" \
-						>>/tmp/hostapd-wisp-$sta.log 2>&1
+		if [ "$network_enabled" = "0" ]; then
+			if [ "$scan_requested" = "0" ]; then
+				wpa_cli -p "$CONF_DIR" -i "$sta" scan >/dev/null 2>&1
+				scan_requested=1
+				scan_wait=0
+				printf '%s %s: initial scan requested for SSID=%s\n' \
+					"$(date +%s)" "$sta" "$target_ssid" >> "$log_file"
+			elif [ "$state" != "SCANNING" ]; then
+				scan_freq="$(scan_frequency "$sta" "$target_ssid")"
+				if [ -n "$scan_freq" ]; then
+					set_wisp_channel "$radio" "$prefix" "$sta" "$scan_freq" "$log_file"
+					wpa_cli -p "$CONF_DIR" -i "$sta" enable_network all >/dev/null 2>&1
+					wpa_cli -p "$CONF_DIR" -i "$sta" reassociate >/dev/null 2>&1
+					network_enabled=1
+				else
+					scan_wait=$((scan_wait + 1))
+					if [ "$scan_wait" -ge 5 ]; then
+						printf '%s %s: target SSID not found, using configured channel\n' \
+							"$(date +%s)" "$sta" >> "$log_file"
+						wpa_cli -p "$CONF_DIR" -i "$sta" enable_network all >/dev/null 2>&1
+						wpa_cli -p "$CONF_DIR" -i "$sta" reassociate >/dev/null 2>&1
+						network_enabled=1
+					fi
 				fi
 			fi
 		fi
-		sleep 30
+
+		if [ "$network_enabled" = "1" ] && [ "$state" = "COMPLETED" ] && [ -n "$freq" ]; then
+			set_wisp_channel "$radio" "$prefix" "$sta" "$freq" "$log_file"
+		fi
+		if [ "$network_enabled" = "0" ]; then
+			sleep 1
+		else
+			sleep 30
+		fi
 	done
 }
 
@@ -213,8 +262,6 @@ stop_radio()
 	local monitor_pid
 	local channel_file
 
-	script_log "stop_radio begin radio=$radio reason=${reason:-unknown}"
-
 	sta="$(sta_ifname "$radio")" || return 1
 	pid_file="$(pidfile "$radio")"
 	monitor_file="$(monitor_pidfile "$radio")"
@@ -222,10 +269,9 @@ stop_radio()
 
 	if [ -r "$monitor_file" ]; then
 		monitor_pid="$(cat "$monitor_file")"
-		script_log "monitor pid file found: $monitor_file pid=${monitor_pid:-empty}"
 		case "$monitor_pid" in
 			*[!0-9]*|'') ;;
-			*) script_log "killing monitor pid=$monitor_pid"; kill "$monitor_pid" 2>/dev/null ;;
+			*) kill "$monitor_pid" 2>/dev/null ;;
 		esac
 	fi
 	rm -f "$monitor_file"
@@ -238,15 +284,13 @@ stop_radio()
 
 	if [ -r "$pid_file" ]; then
 		pid="$(cat "$pid_file")"
-		script_log "wpa pid file found: $pid_file pid=${pid:-empty}"
 		case "$pid" in
 			*[!0-9]*|'') ;;
-			*) script_log "killing wpa_supplicant pid=$pid"; kill "$pid" 2>/dev/null ;;
+			*) kill "$pid" 2>/dev/null ;;
 		esac
 	fi
 
 	if command -v wpa_cli >/dev/null 2>&1; then
-		script_log "sending wpa_cli terminate interface=$sta"
 		wpa_cli -p "$CONF_DIR" -i "$sta" terminate >/dev/null 2>&1
 	fi
 
@@ -254,10 +298,8 @@ stop_radio()
 	rm -f "$pid_file"
 
 	if iw dev "$sta" info >/dev/null 2>&1; then
-		script_log "deleting STA interface=$sta"
 		iw dev "$sta" del
 	fi
-	script_log "stop_radio end radio=$radio reason=${reason:-unknown}"
 }
 
 start_radio()
@@ -317,11 +359,8 @@ start_radio()
 	bridge_sta "$radio"
 
 	mkdir -p "$CONF_DIR"
-	# Keep the supplicant in the background, but retain verbose diagnostics.
 	/usr/sbin/wpa_supplicant -B -Dnl80211 -i "$sta" -c "$conf" -P "$pid_file" \
-		-ddd  -f "/tmp/wpa-supplicant-$sta.log" >/dev/null 2>&1
-	script_log "wpa_supplicant launch returned=$? interface=$sta pid_file=$pid_file"
-
+		-ddd -f "/tmp/wpa-supplicant-$sta.log" >/dev/null 2>&1
 	if is_mode4_ap "$radio"; then
 		# Keep the local AP available even while the upstream STA is scanning.
 		/usr/bin/hostapd.sh "start_$radio" \
