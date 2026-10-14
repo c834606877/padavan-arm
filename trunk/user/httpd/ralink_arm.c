@@ -18,6 +18,15 @@
 #define SCAN_CMD "/usr/sbin/iw"
 #define SCAN_LINE_LEN 256
 
+/* MT7615 keeps the managed scan interfaces as APCLI; MT7915 uses STA. */
+#if defined(BOARD_MT7915_DBDC)
+#define SCAN_2G_IFNAME IFNAME_2G_STA
+#define SCAN_5G_IFNAME IFNAME_5G_STA
+#else
+#define SCAN_2G_IFNAME IFNAME_2G_APCLI
+#define SCAN_5G_IFNAME IFNAME_5G_APCLI
+#endif
+
 struct scan_entry {
 	char bssid[24];
 	char ssid[128];
@@ -283,7 +292,7 @@ ej_wl_scan_5g(int eid, webs_t wp, int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	(void)eid;
-	return scan_interface_arm(wp, IFNAME_5G_MAIN, IFNAME_5G_STA);
+	return scan_interface_arm(wp, IFNAME_5G_MAIN, SCAN_5G_IFNAME);
 }
 #endif
 
@@ -293,5 +302,5 @@ ej_wl_scan_2g(int eid, webs_t wp, int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	(void)eid;
-	return scan_interface_arm(wp, IFNAME_2G_MAIN, IFNAME_2G_STA);
+	return scan_interface_arm(wp, IFNAME_2G_MAIN, SCAN_2G_IFNAME);
 }

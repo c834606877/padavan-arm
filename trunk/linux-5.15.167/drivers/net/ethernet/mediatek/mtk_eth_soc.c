@@ -2876,11 +2876,14 @@ static void mtk_rx_clean(struct mtk_eth *eth, struct mtk_rx_ring *ring, bool in_
 			if (!rxd->rxd1)
 				continue;
 
-			if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
-				addr64 = RX_DMA_GET_ADDR64(rxd->rxd2);
+			if (!ring->page_pool) {
+				if (MTK_HAS_CAPS(eth->soc->caps, MTK_36BIT_DMA))
+					addr64 = RX_DMA_GET_ADDR64(rxd->rxd2);
 
-			dma_unmap_single(eth->dma_dev, ((u64)rxd->rxd1 | addr64),
-					 ring->buf_size, DMA_FROM_DEVICE);
+				dma_unmap_single(eth->dma_dev,
+						 ((u64)rxd->rxd1 | addr64),
+						 ring->buf_size, DMA_FROM_DEVICE);
+			}
 			mtk_rx_put_buff(ring, ring->data[i], false);
 		}
 		kfree(ring->data);
