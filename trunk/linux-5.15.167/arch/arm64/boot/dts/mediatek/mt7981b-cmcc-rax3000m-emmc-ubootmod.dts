@@ -7,8 +7,17 @@
 	model = "CMCC RAX3000M eMMC version (custom U-Boot layout)";
 	compatible = "cmcc,rax3000m-emmc-ubootmod", "mediatek,mt7981";
 
+	/*
+	 * The block2mtd boot argument exposes mmcblk0p2 as "Factory" before
+	 * userspace loads mt7915e.  This node supplies the DT phandle that lets
+	 * mt76 retrieve the per-device Wi-Fi EEPROM from that MTD device.
+	 */
+	factory: factory {
+		label = "Factory";
+	};
+
 	chosen {
-		bootargs = "root=PARTLABEL=rootfs rootwait rootfstype=squashfs,f2fs console=ttyS0,115200n1 earlycon=uart8250,mmio32,0x11002000 clk_ignore_unused loglevel=8";
+		bootargs = "root=PARTLABEL=rootfs rootwait rootfstype=squashfs,f2fs console=ttyS0,115200n1 earlycon=uart8250,mmio32,0x11002000 clk_ignore_unused loglevel=8 block2mtd.block2mtd=/dev/mmcblk0p2,256KiB,Factory";
 	};
 };
 
@@ -23,6 +32,10 @@
 	pinctrl-1 = <&mmc0_pins_uhs>;
 	vmmc-supply = <&reg_3p3v>;
 	status = "okay";
+};
+
+&wifi {
+	mediatek,mtd-eeprom = <&factory 0x0>;
 };
 
 &pio {

@@ -728,8 +728,6 @@ init_router(void)
 
 	char * bl2mtd_value = "/dev/mmcblk0p4,256KiB,config";
 	fput_string(bl2mtd_para, bl2mtd_value);
-	char * bl2mtd_value_2 = "/dev/mmcblk0p2,256KiB,Factory";
-	fput_string(bl2mtd_para, bl2mtd_value_2);
 
 	module_smart_load("nvram_linux",NULL);
 
