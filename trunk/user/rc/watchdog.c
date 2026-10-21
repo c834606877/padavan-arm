@@ -31,6 +31,7 @@
 #include <math.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/reboot.h>
 
 #include "rc.h"
 
@@ -58,6 +59,7 @@ static int ntpc_tries = 0;
 
 static int httpd_missing = 0;
 static int dnsmasq_missing = 0;
+static int kernel_fault_seen = 0;
 
 static struct itimerval wd_itv;
 
@@ -490,6 +492,36 @@ watchdog_on_timer(void)
 	storage_save_time(10);
 }
 
+static int
+kernel_fault_check(void)
+{
+	FILE *fp;
+	char line[256];
+
+	if (kernel_fault_seen)
+		return 0;
+
+	fp = popen("dmesg 2>/dev/null", "r");
+	if (!fp)
+		return 0;
+
+	while (fgets(line, sizeof(line), fp) != NULL) {
+		if (strstr(line, "NETDEV WATCHDOG") ||
+		    strstr(line, "Call trace")) {
+			kernel_fault_seen = 1;
+			pclose(fp);
+			logmessage("watchdog",
+				   "kernel fault detected, rebooting: %s", line);
+			sync();
+			reboot(RB_AUTOBOOT);
+			return -1;
+		}
+	}
+
+	pclose(fp);
+	return 0;
+}
+
 static void
 catch_sig_watchdog(int sig)
 {
@@ -586,6 +618,7 @@ watchdog_main(int argc, char *argv[])
 	/* most of time it goes to sleep */
 	while (1) {
 		pause();
+		kernel_fault_check();
 	}
 
 	return 0;

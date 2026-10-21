@@ -1823,7 +1823,8 @@ static void mtk_update_rx_cpu_idx(struct mtk_eth *eth)
 
 static bool mtk_page_pool_enabled(struct mtk_eth *eth)
 {
-	return mtk_is_netsys_v2_or_greater(eth);
+	/* Temporarily disable page_pool on MT7981 while debugging TX hangs. */
+	return false;
 }
 
 static struct page_pool *mtk_create_page_pool(struct mtk_eth *eth,
@@ -3276,15 +3277,6 @@ static void mtk_dma_free(struct mtk_eth *eth)
 	}
 }
 
-static bool mtk_hw_reset_check(struct mtk_eth *eth)
-{
-	u32 val = mtk_r32(eth, MTK_INT_STATUS2);
-
-	return (val & MTK_FE_INT_FQ_EMPTY) || (val & MTK_FE_INT_RFIFO_UF) ||
-	       (val & MTK_FE_INT_RFIFO_OV) || (val & MTK_FE_INT_TSO_FAIL) ||
-	       (val & MTK_FE_INT_TSO_ALIGN) || (val & MTK_FE_INT_TSO_ILLEGAL);
-}
-
 static void mtk_tx_timeout(struct net_device *dev, unsigned int txqueue)
 {
 	struct mtk_mac *mac = netdev_priv(dev);
@@ -3293,12 +3285,15 @@ static void mtk_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	if (test_bit(MTK_RESETTING, &eth->state))
 		return;
 
-	if (!mtk_hw_reset_check(eth))
-		return;
-
 	eth->netdev[mac->id]->stats.tx_errors++;
-	netif_err(eth, tx_err, dev, "transmit timed out\n");
+	netif_err(eth, tx_err, dev,
+		  "transmit timed out on queue %u, scheduling DMA reset\n",
+		  txqueue);
 
+	/* A TX timeout means that the shared NETSYS DMA path may be stuck.
+	 * Do not rely on the FE error bits: a stalled queue can timeout without
+	 * setting them.  The reset work serializes the full DMA/ring recovery.
+	 */
 	schedule_work(&eth->pending_work);
 }
 
@@ -4782,13 +4777,16 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
 	eth->netdev[id]->netdev_ops = &mtk_netdev_ops;
 	eth->netdev[id]->base_addr = (unsigned long)eth->base;
 
-	eth->netdev[id]->hw_features = eth->soc->hw_features;
+	/* Disable hardware/software segmentation while debugging TX hangs. */
+	eth->netdev[id]->hw_features = eth->soc->hw_features &
+		~(NETIF_F_ALL_TSO | NETIF_F_GSO_MASK);
 	if (eth->hwlro)
 		eth->netdev[id]->hw_features |= NETIF_F_LRO;
 
 	eth->netdev[id]->vlan_features = eth->soc->hw_features &
-		~NETIF_F_HW_VLAN_CTAG_TX;
-	eth->netdev[id]->features |= eth->soc->hw_features;
+		~(NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_ALL_TSO | NETIF_F_GSO_MASK);
+	eth->netdev[id]->features |= eth->netdev[id]->hw_features;
+	eth->netdev[id]->features &= ~(NETIF_F_ALL_TSO | NETIF_F_GSO_MASK);
 	eth->netdev[id]->ethtool_ops = &mtk_ethtool_ops;
 
 	eth->netdev[id]->irq = eth->irq[0];

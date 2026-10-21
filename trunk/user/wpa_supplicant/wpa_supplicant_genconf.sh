@@ -104,8 +104,9 @@ generate_conf()
 		printf 'network={\n'
 		write_network_value ssid "$ssid"
 		if [ "$sta_auto" = "1" ]; then
-			# Scan all channels so the upstream AP can move without changing SSID.
-			printf '%s\n' 'bgscan="simple:30:-70:60"'
+			# WISP monitor performs explicit scans so channel changes are
+			# synchronized with hostapd on the shared PHY.
+			:
 		elif [ -n "$channel" ] && [ "$channel" != "0" ]; then
 			frequency="$(channel_to_frequency "$channel")" || {
 				echo "invalid channel for $ifname: $channel" >&2

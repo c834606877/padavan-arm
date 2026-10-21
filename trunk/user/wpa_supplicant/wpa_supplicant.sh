@@ -189,6 +189,37 @@ set_wisp_channel()
 		>>"/tmp/hostapd-wisp-$sta.log" 2>&1
 }
 
+renew_wisp_dhcp()
+{
+	local sta="$1"
+	local log_file="$2"
+	local pid_file="/var/run/udhcpc0.pid"
+	local pid
+
+	pid="$(cat "$pid_file" 2>/dev/null)"
+	case "$pid" in
+		*[!0-9]*|'')
+			printf '%s %s: udhcpc pidfile unavailable\n' \
+				"$(date +%s)" "$sta" >> "$log_file"
+			return 1
+			;;
+	esac
+
+	if ! kill -0 "$pid" 2>/dev/null; then
+		printf '%s %s: udhcpc pid=%s is not running\n' \
+			"$(date +%s)" "$sta" "$pid" >> "$log_file"
+		return 1
+	fi
+
+	printf '%s %s: DHCP release pid=%s\n' \
+		"$(date +%s)" "$sta" "$pid" >> "$log_file"
+	kill -USR2 "$pid" 2>/dev/null || return 1
+	sleep 1
+	printf '%s %s: DHCP renew pid=%s\n' \
+		"$(date +%s)" "$sta" "$pid" >> "$log_file"
+	kill -USR1 "$pid" 2>/dev/null
+}
+
 sync_wisp_hostapd()
 {
 	local radio="$1"
@@ -203,15 +234,42 @@ sync_wisp_hostapd()
 	local scan_requested=0
 	local network_enabled=0
 	local scan_wait=0
+	local last_state=""
+	local completed_seen=0
+	local non_completed_seconds=0
 
 	sta="$(sta_ifname "$radio")" || return 1
 	log_file="/tmp/hostapd-wisp-$sta.log"
 	target_ssid="$(nvram get "${prefix}sta_ssid")"
 
+	# Do not allow a stale enable_network state to start authentication
+	# before a real upstream BSS has been found and its channel synced.
+	wpa_cli -p "$CONF_DIR" -i "$sta" disable_network all >/dev/null 2>&1
+
+
 	while [ -r "$(monitor_pidfile "$radio")" ]; do
 		status="$(wpa_cli -p "$CONF_DIR" -i "$sta" status 2>/dev/null)"
 		state="$(printf '%s\n' "$status" | sed -n 's/^wpa_state=//p')"
 		freq="$(printf '%s\n' "$status" | sed -n 's/^freq=//p')"
+
+		if [ "$state" = "COMPLETED" ]; then
+			completed_seen=1
+			non_completed_seconds=0
+		elif [ "$network_enabled" = "1" ] && [ "$completed_seen" = "1" ] &&
+			[ -n "$state" ]; then
+			non_completed_seconds=$((non_completed_seconds + 1))
+			if [ "$non_completed_seconds" -ge 5 ]; then
+				printf '%s %s: state=%s for %ss, restarting WISP channel sync\n' \
+					"$(date +%s)" "$sta" "$state" "$non_completed_seconds" >> "$log_file"
+				wpa_cli -p "$CONF_DIR" -i "$sta" disable_network all >/dev/null 2>&1
+				network_enabled=0
+				scan_requested=0
+				scan_wait=0
+				completed_seen=0
+				non_completed_seconds=0
+				freq=""
+			fi
+		fi
 
 		if [ "$network_enabled" = "0" ]; then
 			if [ "$scan_requested" = "0" ]; then
@@ -223,18 +281,23 @@ sync_wisp_hostapd()
 			elif [ "$state" != "SCANNING" ]; then
 				scan_freq="$(scan_frequency "$sta" "$target_ssid")"
 				if [ -n "$scan_freq" ]; then
-					set_wisp_channel "$radio" "$prefix" "$sta" "$scan_freq" "$log_file"
+					if ! set_wisp_channel "$radio" "$prefix" "$sta" "$scan_freq" "$log_file"; then
+						# Keep the network disabled while the shared PHY is being
+						# reconfigured. Retry with a fresh scan on the next pass.
+						scan_requested=0
+						sleep 1
+						continue
+					fi
 					wpa_cli -p "$CONF_DIR" -i "$sta" enable_network all >/dev/null 2>&1
 					wpa_cli -p "$CONF_DIR" -i "$sta" reassociate >/dev/null 2>&1
 					network_enabled=1
 				else
 					scan_wait=$((scan_wait + 1))
 					if [ "$scan_wait" -ge 5 ]; then
-						printf '%s %s: target SSID not found, using configured channel\n' \
+						printf '%s %s: target SSID not found, keeping network disabled; retrying scan\n' \
 							"$(date +%s)" "$sta" >> "$log_file"
-						wpa_cli -p "$CONF_DIR" -i "$sta" enable_network all >/dev/null 2>&1
-						wpa_cli -p "$CONF_DIR" -i "$sta" reassociate >/dev/null 2>&1
-						network_enabled=1
+						scan_requested=0
+						scan_wait=0
 					fi
 				fi
 			fi
@@ -242,12 +305,12 @@ sync_wisp_hostapd()
 
 		if [ "$network_enabled" = "1" ] && [ "$state" = "COMPLETED" ] && [ -n "$freq" ]; then
 			set_wisp_channel "$radio" "$prefix" "$sta" "$freq" "$log_file"
+			if [ "$last_state" != "COMPLETED" ]; then
+				renew_wisp_dhcp "$sta" "$log_file"
+			fi
 		fi
-		if [ "$network_enabled" = "0" ]; then
-			sleep 1
-		else
-			sleep 30
-		fi
+		last_state="$state"
+		sleep 1
 	done
 }
 
