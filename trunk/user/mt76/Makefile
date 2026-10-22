@@ -5,6 +5,17 @@ SRC_URL = https://github.com/openwrt/mt76/archive/refs/heads/openwrt-23.05.zip
 
 THISDIR = $(shell pwd)
 
+include $(ROOTDIR)/user/shared/boards.mk
+
+# The driver requests the generic mt7981_eeprom_mt7976_dbdc.bin fallback
+# name.  A board may override its source through BOARD_SPECIFIC_DBDC.
+ifneq ($(strip $(BOARD_SPECIFIC_DBDC)),)
+# $(error BOARD_SPECIFIC_DBDC detected: $(BOARD_SPECIFIC_DBDC))
+MT7981_EEPROM_DEFAULT = $(BOARD_SPECIFIC_DBDC)
+else
+MT7981_EEPROM_DEFAULT = $(THISDIR)/$(SRC_NAME)/firmware/mt7981_eeprom_mt7976_dbdc.bin
+endif
+
 #KBUILDDIR=$(ROOTDIR)/$(LINUXDIR)
 KBUILDDIR=/home/user/workdir/openwrt-fs/padavan-arm/trunk/linux-5.15.167/
 
@@ -55,6 +66,6 @@ romfs:
 	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/firmware/mt7981_rom_patch.bin /lib/firmware/mediatek/mt7981_rom_patch.bin
 	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/firmware/mt7981_wa.bin /lib/firmware/mediatek/mt7981_wa.bin
 	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/firmware/mt7981_wm.bin /lib/firmware/mediatek/mt7981_wm.bin
-	$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/firmware/mt7981_eeprom_mt7976_dbdc.bin /lib/firmware/mediatek/mt7981_eeprom_mt7976_dbdc.bin
+	$(ROMFSINST) $(MT7981_EEPROM_DEFAULT) /lib/firmware/mediatek/mt7981_eeprom_mt7976_dbdc.bin
 	#$(ROMFSINST) $(THISDIR)/$(SRC_NAME)/firmware/mt7981_rom_patch.bin /lib/firmware/mediatek/mt7981_rom_patch.bin
 
