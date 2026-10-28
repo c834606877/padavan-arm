@@ -199,6 +199,15 @@ function change_guest_auth_mode(mflag) {
 				document.form.rt_guest_wpa_mode.value = "2";
 			}
 		}
+		else if(opts[opts.selectedIndex].text == "WPA2/WPA3-Personal" || opts[opts.selectedIndex].text == "WPA3-Personal (SAE)")
+		{
+			if (mflag == 1) {
+				document.form.rt_guest_crypto.options[0].selected = 0;
+				document.form.rt_guest_crypto.options[1].selected = 1;
+				document.form.rt_guest_crypto.options[2].selected = 0;
+				document.form.rt_guest_wpa_mode.value = opts[opts.selectedIndex].text == "WPA3-Personal (SAE)" ? "5" : "6";
+			}
+		}
 		else if(opts[opts.selectedIndex].text == "WPA-Personal")
 		{
 			if (mflag == 1) {
@@ -415,6 +424,8 @@ function change_guest_auth_mode(mflag) {
                                                     <option value="psk" <% nvram_double_match_x("", "rt_guest_auth_mode", "psk", "", "rt_guest_wpa_mode", "1", "selected"); %>>WPA-Personal</option>
                                                     <option value="psk" <% nvram_double_match_x("", "rt_guest_auth_mode", "psk", "", "rt_guest_wpa_mode", "2", "selected"); %>>WPA2-Personal</option>
                                                     <option value="psk" <% nvram_double_match_x("", "rt_guest_auth_mode", "psk", "", "rt_guest_wpa_mode", "0", "selected"); %>>WPA-Auto-Personal</option>
+                                                    <option value="psk" <% nvram_double_match_x("", "rt_guest_auth_mode", "psk", "", "rt_guest_wpa_mode", "6", "selected"); %>>WPA2/WPA3-Personal</option>
+                                                    <option value="psk" <% nvram_double_match_x("", "rt_guest_auth_mode", "psk", "", "rt_guest_wpa_mode", "5", "selected"); %>>WPA3-Personal (SAE)</option>
                                                 </select>
                                             </td>
                                         </tr>

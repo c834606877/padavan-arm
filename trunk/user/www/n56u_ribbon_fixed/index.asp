@@ -124,6 +124,10 @@ function show_middle_status(){
 			security_mode = "WPA2-Personal";
 		else if(wpa_mode == "0")
 			security_mode = "WPA-Auto-Personal";
+		else if(wpa_mode == "6")
+			security_mode = "WPA2/WPA3-Personal";
+		else if(wpa_mode == "5")
+			security_mode = "WPA3-Personal (SAE)";
 		else
 			alert("System error for showing auth_mode!");
 	}

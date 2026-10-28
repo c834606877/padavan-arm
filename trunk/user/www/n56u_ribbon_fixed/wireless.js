@@ -57,6 +57,10 @@ function change_common_wl(o, s, v) {
                 document.form.wl_wpa_mode.value = "2";
             else if (opts[opts.selectedIndex].text == "WPA-Auto-Personal")
                 document.form.wl_wpa_mode.value = "0";
+            else if (opts[opts.selectedIndex].text == "WPA2/WPA3-Personal")
+                document.form.wl_wpa_mode.value = "6";
+            else if (opts[opts.selectedIndex].text == "WPA3-Personal (SAE)")
+                document.form.wl_wpa_mode.value = "5";
             else if (opts[opts.selectedIndex].text == "WPA-Enterprise")
                 document.form.wl_wpa_mode.value = "3";
             else if (opts[opts.selectedIndex].text == "WPA-Auto-Enterprise")
@@ -662,7 +666,9 @@ function wl_auth_mode_change(isload) {
 
         if (opts[opts.selectedIndex].text == "WPA-Personal")
             algos = new Array("TKIP");
-        else if (opts[opts.selectedIndex].text == "WPA2-Personal")
+        else if (opts[opts.selectedIndex].text == "WPA2-Personal" ||
+                 opts[opts.selectedIndex].text == "WPA2/WPA3-Personal" ||
+                 opts[opts.selectedIndex].text == "WPA3-Personal (SAE)")
             algos = new Array("AES");
         else
             algos = new Array("AES", "TKIP+AES");

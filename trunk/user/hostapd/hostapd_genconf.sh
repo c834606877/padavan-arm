@@ -33,6 +33,7 @@ generate_hostapd_conf() {
     local ssid=$(nvram get "${prefix}ssid")
     local wpa_key=$(nvram get "${prefix}wpa_psk")
     local auth_mode=$(nvram get "${prefix}auth_mode")
+    local wpa_mode=$(nvram get "${prefix}wpa_mode")
     local channel=$(nvram get "${prefix}channel")
     local sta_auto=$(nvram get "${prefix}sta_auto")
     local closed=$(nvram get "${prefix}closed")
@@ -187,6 +188,23 @@ EOF
     # 4. Handle security mode for the primary interface
     if [ "$auth_mode" = "open" ] || [ -z "$wpa_key" ]; then
         echo "wpa=0" >> "$conf_file"
+    elif [ "$wpa_mode" = "5" ]; then
+        cat <<EOF >> "$conf_file"
+wpa=2
+wpa_key_mgmt=SAE
+wpa_pairwise=CCMP
+ieee80211w=2
+wpa_passphrase=$wpa_key
+EOF
+    elif [ "$wpa_mode" = "6" ]; then
+        cat <<EOF >> "$conf_file"
+wpa=2
+wpa_key_mgmt=WPA-PSK SAE
+wpa_pairwise=CCMP
+ieee80211w=1
+sae_require_mfp=1
+wpa_passphrase=$wpa_key
+EOF
     else
         cat <<EOF >> "$conf_file"
 wpa=2
@@ -213,11 +231,9 @@ EOF
         local guest_ssid=$(nvram get "${prefix}guest_ssid")
         
         # Dynamically reference non-symmetric NVRAM variable names without using if
-        local guest_auth_var="${prefix}guest_auth_mode"
-        [ "$prefix" = "rt_" ] && guest_auth_var="rt_guest_wpa_mode"
-
-        eval guest_key=\$\(nvram get \"${prefix}guest_wpa_psk\"\)
-        eval guest_auth=\$\(nvram get \"\$guest_auth_var\"\)
+        local guest_key=$(nvram get "${prefix}guest_wpa_psk")
+        local guest_auth=$(nvram get "${prefix}guest_auth_mode")
+        local guest_wpa_mode=$(nvram get "${prefix}guest_wpa_mode")
 
         local ap_isolate=$(nvram get "${prefix}guest_ap_isolate")
         local guest_closed=$(nvram get "${prefix}guest_closed")
@@ -236,6 +252,23 @@ EOF
         # Dynamically handle security mode for the Guest interface
         if [ "$guest_auth" = "open" ] || [ -z "$guest_key" ]; then
             echo "wpa=0" >> "$conf_file"
+        elif [ "$guest_wpa_mode" = "5" ]; then
+            cat <<EOF >> "$conf_file"
+wpa=2
+wpa_key_mgmt=SAE
+wpa_pairwise=CCMP
+ieee80211w=2
+wpa_passphrase=$guest_key
+EOF
+        elif [ "$guest_wpa_mode" = "6" ]; then
+            cat <<EOF >> "$conf_file"
+wpa=2
+wpa_key_mgmt=WPA-PSK SAE
+wpa_pairwise=CCMP
+ieee80211w=1
+sae_require_mfp=1
+wpa_passphrase=$guest_key
+EOF
         else
             cat <<EOF >> "$conf_file"
 wpa=2

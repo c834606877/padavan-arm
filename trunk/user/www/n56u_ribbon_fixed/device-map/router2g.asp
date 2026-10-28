@@ -106,6 +106,10 @@ function show_middle_status_router(){
 			security_mode = "WPA2-Personal";
 		else if(wpa_mode == "0")
 			security_mode = "WPA-Auto-Personal";
+		else if(wpa_mode == "6")
+			security_mode = "WPA2/WPA3-Personal";
+		else if(wpa_mode == "5")
+			security_mode = "WPA3-Personal (SAE)";
 	}
 	else if(auth_mode == "wpa"){
 		if(wpa_mode == "3")
@@ -348,6 +352,10 @@ function change_auth_mode(auth_mode_obj){
 			document.form.rt_wpa_mode.value="2";
 		else if(opts[opts.selectedIndex].text == "WPA-Auto-Personal")
 			document.form.rt_wpa_mode.value="0";
+		else if(opts[opts.selectedIndex].text == "WPA2/WPA3-Personal")
+			document.form.rt_wpa_mode.value="6";
+		else if(opts[opts.selectedIndex].text == "WPA3-Personal (SAE)")
+			document.form.rt_wpa_mode.value="5";
 		else if(opts[opts.selectedIndex].text == "WPA-Enterprise (Radius)")
 			document.form.rt_wpa_mode.value="3";
 		else if(opts[opts.selectedIndex].text == "WPA-Auto-Enterprise (Radius)")
@@ -645,6 +653,8 @@ window.onunload  = function(){
 		<option value="psk" <% nvram_double_match_x("", "rt_auth_mode", "psk", "", "rt_wpa_mode", "1", "selected"); %>>WPA-Personal</option>
 		<option value="psk" <% nvram_double_match_x("", "rt_auth_mode", "psk", "", "rt_wpa_mode", "2", "selected"); %>>WPA2-Personal</option>
 		<option value="psk" <% nvram_double_match_x("", "rt_auth_mode", "psk", "", "rt_wpa_mode", "0", "selected"); %>>WPA-Auto-Personal</option>
+		<option value="psk" <% nvram_double_match_x("", "rt_auth_mode", "psk", "", "rt_wpa_mode", "6", "selected"); %>>WPA2/WPA3-Personal</option>
+		<option value="psk" <% nvram_double_match_x("", "rt_auth_mode", "psk", "", "rt_wpa_mode", "5", "selected"); %>>WPA3-Personal (SAE)</option>
 		<option value="wpa" <% nvram_double_match_x("", "rt_auth_mode", "wpa", "", "rt_wpa_mode", "3", "selected"); %>>WPA-Enterprise (Radius)</option>
 		<option value="wpa2" <% nvram_match_x("", "rt_auth_mode", "wpa2", "selected"); %>>WPA2-Enterprise (Radius)</option>
 		<option value="wpa" <% nvram_double_match_x("", "rt_auth_mode", "wpa", "", "rt_wpa_mode", "4", "selected"); %>>WPA-Auto-Enterprise (Radius)</option>
