@@ -369,6 +369,7 @@ Disconnect=Pause
 btn_go=GÅ
 Printing_status=Udskrivningsstatus:
 Computer_Name=Navn
+Client_Traffic=Trafik
 Printing_button_item=Tilstanden Monopol:
 MoreConfig=Mere config
 ConnectedClient=Klientliste

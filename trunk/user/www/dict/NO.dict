@@ -369,6 +369,7 @@ Disconnect=Pause
 btn_go=Gå
 Printing_status=Utskriftsstatus:
 Computer_Name=Navn
+Client_Traffic=Trafikk
 Printing_button_item=Monopolimodus:
 MoreConfig=Mer konfigurasjon
 ConnectedClient=Klientliste

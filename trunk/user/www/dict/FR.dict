@@ -373,6 +373,7 @@ MoreConfig=Configuration avancée
 Printing_status=Etat de l'impression:
 Printing_button_item=Monopoly mode:(???)
 Computer_Name=Nom
+Client_Traffic=Trafic
 ConnectedClient=Liste des clients
 BlockedClient=Liste des clients bloqués
 Type=Type

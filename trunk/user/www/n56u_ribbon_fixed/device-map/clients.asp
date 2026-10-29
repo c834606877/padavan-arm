@@ -33,6 +33,9 @@ var clients = getclients(1,0);
 var unblocked_clients = new Array();
 var blocked_clients = new Array();
 var page_modified = 0;
+var traffic_enabled = false;
+var traffic_timer = 0;
+var traffic_stats = {};
 
 function initial(){
 	if (sw_mode == "3") {
@@ -42,6 +45,69 @@ function initial(){
 	prepare_clients();
 	show_clients();
 	check_full_scan_done();
+	init_traffic_monitor();
+}
+
+function format_rate(bytes){
+	bytes = Number(bytes) || 0;
+	if(bytes < 1048576) return (bytes / 1024).toFixed(2) + " KB/s";
+	return (bytes / 1048576).toFixed(2) + " MB/s";
+}
+
+function traffic_cell(ip){
+	var stat = traffic_stats[ip];
+	if(!traffic_enabled || !stat)
+		return "-";
+	return "<span title='RX " + format_rate(stat.rx_bps) + ", TX " + format_rate(stat.tx_bps) + "'>" +
+		"&uarr; " + format_rate(stat.tx_bps) + "<br>&darr; " + format_rate(stat.rx_bps) + "</span>";
+}
+
+function update_traffic_cells(){
+	$j("span.client_traffic").each(function(){
+		var ip = $j(this).attr("data-ip");
+		$j(this).html(traffic_cell(ip));
+		$j(this).closest("td.client_name").toggleClass("traffic_enabled", traffic_enabled);
+	});
+}
+
+function poll_traffic(){
+	if(!traffic_enabled) return;
+	$j.ajax({
+		url: "/traffic_control.asp?action=status&_=" + new Date().getTime(),
+		dataType: "json",
+		cache: false,
+		success: function(data){
+			traffic_stats = {};
+			if(data && data.clients)
+				for(var i = 0; i < data.clients.length; i++)
+					traffic_stats[data.clients[i].ip] = data.clients[i];
+			update_traffic_cells();
+		}
+	});
+	traffic_timer = setTimeout(poll_traffic, 1000);
+}
+
+function set_traffic_monitor(enabled){
+	traffic_enabled = enabled;
+	clearTimeout(traffic_timer);
+	$j.ajax({
+		url: "/traffic_control.asp?action=" + (enabled ? "start" : "stop"),
+		dataType: "json",
+		cache: false,
+		success: function(data){
+			traffic_stats = {};
+			if(data && data.clients)
+				for(var i = 0; i < data.clients.length; i++)
+					traffic_stats[data.clients[i].ip] = data.clients[i];
+			update_traffic_cells();
+			if(traffic_enabled) poll_traffic();
+		}
+	});
+}
+
+function init_traffic_monitor(){
+	var checkbox = $("traffic_enable");
+	if(checkbox) checkbox.checked = false;
 }
 
 function prepare_clients(){
@@ -160,7 +226,9 @@ function add_client_row(table, atIndex, client, blocked, j){
 
 	typeCell.style.textAlign = "center";
 	typeCell.innerHTML = "<img title='"+ DEVICE_TYPE[client[5]]+"' src='/bootstrap/img/wl_device/" + client[5] +".gif'>";
-	nameCell.innerHTML = (client[6] == "1") ? "<a href=http://" + client[0] + " target='blank'>" + client[0] + "</a>" : client[0];
+	nameCell.className = "client_name";
+	nameCell.innerHTML = ((client[6] == "1") ? "<a href=http://" + client[0] + " target='blank'>" + client[0] + "</a>" : client[0]) +
+		"<span class='client_traffic' data-ip='" + (client[1] || "") + "'>" + traffic_cell(client[1]) + "</span>";
 	ipCell.innerHTML = (client[6] == "1") ? "<a href=http://" + client[1] + " target='blank'>" + client[1] + "</a>" : client[1];
 	macCell.innerHTML = "<a target='_blank' href='https://services13.ieee.org/RST/standards-ra-web/rest/assignments/?registry=MAC&text=" + client[2].substr(0,6) + "'>" + mac_add_delimiters(client[2]) + "</a>";
 	if (client[3] == 10){
@@ -207,6 +275,7 @@ function show_clients(){
 
 	if (table2.rows.length < 3 && sw_mode != "3")
 		$j("#xClients_table tbody").append(NDRow);
+	update_traffic_cells();
 }
 
 function sort(mode) {
@@ -337,6 +406,13 @@ function networkmap_update(s){
 
 <style>
     .table th, .table td{vertical-align: middle; text-align: center;}
+    .client_name{position: relative;}
+    .client_name.traffic_enabled{padding-right: 66px !important;}
+    .client_name_header{position: relative; padding-right: 66px !important;}
+    .client_traffic, .client_traffic_toggle{letter-spacing: -0.017em;}
+    .client_traffic{position: absolute; top: 50%; right: 4px; transform: translateY(-50%); text-align: right; font-size: 66%; line-height: 1; white-space: nowrap;}
+    .client_traffic_toggle{position: absolute; top: 50%; right: 4px; transform: translateY(-50%); display: inline-block; font-size: inherit; line-height: inherit; white-space: nowrap;}
+    .client_traffic_toggle input{vertical-align: middle;}
 </style>
 
 </head>
@@ -370,11 +446,11 @@ function networkmap_update(s){
 <table id="Clients_table" width="100%" align="center" cellpadding="1" class="table">
     <thead>
         <tr>
-            <th colspan="5" style="text-align: center;"><#ConnectedClient#></th>
+            <th colspan="6" style="text-align: center;"><#ConnectedClient#></th>
         </tr>
         <tr>
             <th width="8%"><a href="javascript:sort(0)"><#Type#></a></th>
-            <th><a href="javascript:sort(1)"><#Computer_Name#></a></th>
+            <th class="client_name_header"><a href="javascript:sort(1)"><#Computer_Name#></a> <label class="client_traffic_toggle" for="traffic_enable"><input type="checkbox" id="traffic_enable" onchange="set_traffic_monitor(this.checked);"> <#Client_Traffic#></label></th>
             <th width="20%"><a href="javascript:sort(2)">IP</a></th>
             <th width="24%"><a href="javascript:sort(3)">MAC</a></th>
             <th width="8%" id="col_rssi"><a href="javascript:sort(4)">RSSI</a></th>
@@ -389,7 +465,7 @@ function networkmap_update(s){
 <table id="xClients_table" width="100%" align="center" class="table">
     <thead>
         <tr>
-            <th colspan="5" style="text-align: center;"><#BlockedClient#></th>
+            <th colspan="6" style="text-align: center;"><#BlockedClient#></th>
         </tr>
         <tr>
             <th width="8%"><#Type#></th>

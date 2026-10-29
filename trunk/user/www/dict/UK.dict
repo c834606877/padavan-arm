@@ -854,6 +854,7 @@ MoreConfig=Додаткові налаштування
 Printing_status=Статус друку:
 Printing_button_item=Монопольний режим:
 Computer_Name=Ім&#39;я
+Client_Traffic=Трафік
 ConnectedClient=Список клієнтів
 BlockedClient=Список заблокованих клієнтів
 Type=Тип

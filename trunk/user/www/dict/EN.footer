@@ -968,6 +968,7 @@ MoreConfig=More Config
 Printing_status=Printing Status:
 Printing_button_item=Monopoly Mode:
 Computer_Name=Name
+Client_Traffic=Traffic
 ConnectedClient=Client List
 BlockedClient=Blocked Client List
 Type=Type

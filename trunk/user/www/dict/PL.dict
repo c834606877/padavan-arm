@@ -373,6 +373,7 @@ MoreConfig=Dalsze konfiguracje
 Printing_status=Status drukowania:
 Printing_button_item=Monopolu w trybie:
 Computer_Name=Nazwa
+Client_Traffic=Ruch
 ConnectedClient=Lista Klientów
 BlockedClient=Lista zablokowanych klientów
 Type=Typ

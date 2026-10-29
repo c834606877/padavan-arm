@@ -373,6 +373,7 @@ MoreConfig=Další nastavení
 Printing_status=Stav tisku:
 Printing_button_item=Monopoly režim:
 Computer_Name=Název
+Client_Traffic=Provoz
 ConnectedClient=Seznam klientů
 BlockedClient=Seznam blokovaných klientů
 Type=Typ

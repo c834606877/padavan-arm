@@ -365,6 +365,7 @@ Disconnect=Pausar
 btn_go=IR
 Printing_status=Estado da impressão:
 Computer_Name=Nome
+Client_Traffic=Tráfego
 Printing_button_item=Modo de monopólio:
 MoreConfig=Mais configuração
 ConnectedClient=Lista de clientes

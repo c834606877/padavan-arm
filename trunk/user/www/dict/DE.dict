@@ -370,6 +370,7 @@ MoreConfig=Weitere Konfigurationsmöglichkeiten
 Printing_status=Druckstatus:
 Printing_button_item=Monopoly-Modus:
 Computer_Name=Name
+Client_Traffic=Datenverkehr
 ConnectedClient=Client-Liste
 BlockedClient=Blockierte Clients-Liste
 Type=Typ

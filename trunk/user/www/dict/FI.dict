@@ -369,6 +369,7 @@ Disconnect=Keskeytä
 btn_go=SIIRRY
 Printing_status=Tulostimen tila:
 Computer_Name=Nimi
+Client_Traffic=Liikenne
 Printing_button_item=Monopoly-tila:
 MoreConfig=Lisää määrityksiä
 ConnectedClient=Asiakasluettelo

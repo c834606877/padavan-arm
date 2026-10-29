@@ -218,6 +218,7 @@ dir_y 						+= mt76
 dir_y 						+= iw
 dir_y 						+= hostapd
 dir_y 						+= nftables
+dir_y 						+= traffic_daemon
 
 #all:
 #	for i in $(dir_y) ; do \

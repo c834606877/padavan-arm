@@ -3815,6 +3815,56 @@ struct mime_handler mime_handlers[] = {
 
 // traffic monitor
 static int
+ej_traffic_control(int eid, webs_t wp, int argc, char **argv)
+{
+	const char *action = websGetVar(wp, "action", "status");
+	const char *pidfile = "/var/run/traffic_daemon.pid";
+	const char *jsonfile = "/tmp/traffic.json";
+	const char *ip = nvram_safe_get("lan_ipaddr_t");
+	const char *mask = nvram_safe_get("lan_netmask");
+	struct in_addr mask_addr;
+	unsigned int mask_value;
+	int prefix = 0;
+	char cidr[64];
+	FILE *file;
+	char buffer[512];
+	size_t length;
+
+	(void) eid;
+	(void) argc;
+	(void) argv;
+
+	if (!strcmp(action, "start")) {
+		if (inet_aton(mask, &mask_addr)) {
+			mask_value = ntohl(mask_addr.s_addr);
+			while (mask_value & 0x80000000U) {
+				prefix++;
+				mask_value <<= 1;
+			}
+		}
+		snprintf(cidr, sizeof(cidr), "%s/%d", ip, prefix);
+		eval("start-stop-daemon", "-S", "-b", "-m", "-p", pidfile,
+			"-x", "/usr/sbin/traffic_daemon", "--", "-i", "br0",
+			"-n", cidr, "-o", jsonfile, "-p", pidfile);
+	} else if (!strcmp(action, "stop")) {
+		eval("start-stop-daemon", "-K", "-p", pidfile,
+			"-x", "/usr/sbin/traffic_daemon");
+		unlink(jsonfile);
+		unlink(pidfile);
+	}
+
+	file = fopen(jsonfile, "r");
+	if (file) {
+		while ((length = fread(buffer, 1, sizeof(buffer), file)) > 0)
+			websWrite(wp, "%.*s", (int) length, buffer);
+		fclose(file);
+	} else {
+		websWrite(wp, "{\"timestamp\":0,\"clients\":[]}");
+	}
+	return 0;
+}
+
+static int
 ej_netdev(int eid, webs_t wp, int argc, char **argv)
 {
 	FILE *fp;
@@ -4031,6 +4081,7 @@ struct ej_handler ej_handlers[] =
 	{ "json_system_status", ej_system_status_hook},
 
 	{ "netdev", ej_netdev},
+	{ "traffic_control", ej_traffic_control},
 	{ "bandwidth", ej_bandwidth},
 	{ "nvram", ej_backup_nvram},
 

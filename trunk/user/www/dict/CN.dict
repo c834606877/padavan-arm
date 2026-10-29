@@ -983,6 +983,7 @@ MoreConfig=更多设置
 Printing_status=打印状态:
 Printing_button_item=独占模式:
 Computer_Name=名称
+Client_Traffic=速度
 ConnectedClient=已连接设备
 BlockedClient=已阻止设备
 Type=类型
