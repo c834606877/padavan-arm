@@ -126,6 +126,9 @@ int is_usbnet_interface(const char *ifname)
 		return 1;
 	if(!strncmp(ifname, "wwan", 4))
 		return 1;
+	/* Android USB tethering commonly exposes an RNDIS interface as usbN. */
+	if(!strncmp(ifname, "usb", 3) && ifname[3] >= '0' && ifname[3] <= '9')
+		return 1;
 	return 0;
 }
 

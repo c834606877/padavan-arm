@@ -22,20 +22,22 @@ The project is under active development. Key milestones achieved:
   - `dnsmasq` / **DHCP** / **Samba** / **vsftpd** servers are fully functional.
   - `httpd` web server is up and running.
   - **WebUI (WWW)** is accessible and stable.
-- [x] **WAN Side**: (udhcpc works for Dyamic IPoE and PPPoE)
+- [x] **WAN Side**: `udhcpc` works for Dynamic IPoE and PPPoE; Android RNDIS USB tethering works as WAN.
 - [x] **Wlan**: (MT7981,MT7915E, kernel driver is ready).
 - [x] **Wi-Fi Tools**: 
   - Modern Tools `iw`, `hostapd`, `libnl-tiny`, `wireless-regdb` porting done.
-- [x] **Wi-Fi**: (In Progress).
+- [x] **Wi-Fi AP**: Core 2.4 GHz and 5 GHz access point operation works.
   - [x] `2.4Ghz` works.
   - [x] `5Ghz` works, All bandwidth works `20Mhz` `40Mhz` `80Mhz` `160Mhz`
   - [x] User/Psw  Settings is works.
+  - [x] WPA3-Personal and WPA2/WPA3 transition mode.
+  - [x] Guest Wi-Fi.
   - [ ] `Other Settings from WebUI is ongoing.`
   - [ ] Wi-Fi repeater is under development.
 - [ ] DLNA is under development.
-- [x] **Features**: CAKE/QoS with TC.
+- [x] **Features**: CAKE/QoS with TC, traffic monitor, AP mode, and persistent storage.
 - [x] *NVRAM*: Works.
-- [x] *USB*: Works.
+- [x] *USB*: USB storage and Android RNDIS tethering are supported.
 - [x] *LED*: Works.
 - [x] **Web Upgrade**: Works for emmc board.
   - Supported the sysupgrade style tar to update kerel and rootfs partitions.

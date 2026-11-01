@@ -310,6 +310,12 @@ get_modem_ndis_ifname(char ndis_ifname[16], int *devnum_out)
 			sprintf(ndis_ifname, "weth%d", valid_node);
 			return 1;
 		}
+		/* Android USB tethering commonly uses usbN for RNDIS. */
+		valid_node = find_modem_node("usb", 0, 0, -1, devnum_out);
+		if (valid_node >= 0) {
+			sprintf(ndis_ifname, "usb%d", valid_node);
+			return 1;
+		}
 	}
 
 	return 0;

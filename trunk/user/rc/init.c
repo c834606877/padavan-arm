@@ -398,6 +398,7 @@ init_mdev(void)
 		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "sr[0-9]",      "@", "mdev_sr");
 		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "weth[0-9]",    "*", "mdev_net");
 		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "wwan[0-9]",    "*", "mdev_net");
+		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "usb[0-9]",     "*", "mdev_net");
 		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "cdc-wdm[0-9]", "*", "mdev_wdm");
 		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "ttyUSB[0-9]",  "*", "mdev_tty");
 		fprintf(fp, "%s 0:0 0660 %s/sbin/%s $MDEV $ACTION\n", "ttyACM[0-9]",  "*", "mdev_tty");
