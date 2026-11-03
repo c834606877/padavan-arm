@@ -54,12 +54,34 @@ function format_rate(bytes){
 	return (bytes / 1048576).toFixed(2) + " MB/s";
 }
 
+function traffic_top_colors(){
+    var rates = [];
+    for(var ip in traffic_stats){
+        if(!traffic_stats.hasOwnProperty(ip)) continue;
+        var stat = traffic_stats[ip];
+        var tx = Number(stat.tx_bps) || 0;
+        var rx = Number(stat.rx_bps) || 0;
+        if(tx > 1048576) rates.push({key: ip + ":tx", rate: tx});
+        if(rx > 1048576) rates.push({key: ip + ":rx", rate: rx});
+    }
+    rates.sort(function(a, b){return b.rate - a.rate;});
+    var colors = ["#8B1E2D", "#F28C28", "#D6A800"];
+    var top = {};
+    for(var i = 0; i < rates.length && i < colors.length; i++)
+        top[rates[i].key] = colors[i];
+    return top;
+}
+
 function traffic_cell(ip){
 	var stat = traffic_stats[ip];
 	if(!traffic_enabled || !stat)
 		return "-";
+	var top_colors = traffic_top_colors();
+	var tx_color = top_colors[ip + ":tx"];
+	var rx_color = top_colors[ip + ":rx"];
 	return "<span title='RX " + format_rate(stat.rx_bps) + ", TX " + format_rate(stat.tx_bps) + "'>" +
-		"&uarr; " + format_rate(stat.tx_bps) + "<br>&darr; " + format_rate(stat.rx_bps) + "</span>";
+        "&uarr; <span" + (tx_color ? " style='color:" + tx_color + ";font-weight:bold'" : "") + ">" + format_rate(stat.tx_bps) + "</span><br>" +
+        "&darr; <span" + (rx_color ? " style='color:" + rx_color + ";font-weight:bold'" : "") + ">" + format_rate(stat.rx_bps) + "</span></span>";
 }
 
 function update_traffic_cells(){
@@ -227,7 +249,7 @@ function add_client_row(table, atIndex, client, blocked, j){
 	typeCell.style.textAlign = "center";
 	typeCell.innerHTML = "<img title='"+ DEVICE_TYPE[client[5]]+"' src='/bootstrap/img/wl_device/" + client[5] +".gif'>";
 	nameCell.className = "client_name";
-	nameCell.innerHTML = ((client[6] == "1") ? "<a href=http://" + client[0] + " target='blank'>" + client[0] + "</a>" : client[0]) +
+	nameCell.innerHTML = ((client[6] == "1") ? "<a href=http://" + client[1] + " target='blank'>" + client[0] + "</a>" : client[0]) +
 		"<span class='client_traffic' data-ip='" + (client[1] || "") + "'>" + traffic_cell(client[1]) + "</span>";
 	ipCell.innerHTML = (client[6] == "1") ? "<a href=http://" + client[1] + " target='blank'>" + client[1] + "</a>" : client[1];
 	macCell.innerHTML = "<a target='_blank' href='https://services13.ieee.org/RST/standards-ra-web/rest/assignments/?registry=MAC&text=" + client[2].substr(0,6) + "'>" + mac_add_delimiters(client[2]) + "</a>";
@@ -407,8 +429,8 @@ function networkmap_update(s){
 <style>
     .table th, .table td{vertical-align: middle; text-align: center;}
     .client_name{position: relative;}
-    .client_name.traffic_enabled{padding-right: 66px !important;}
-    .client_name_header{position: relative; padding-right: 66px !important;}
+    .client_name.traffic_enabled{padding-right: 50px !important;}
+    .client_name_header{position: relative; padding-right: 50px !important;}
     .client_traffic, .client_traffic_toggle{letter-spacing: -0.017em;}
     .client_traffic{position: absolute; top: 50%; right: 4px; transform: translateY(-50%); text-align: right; font-size: 66%; line-height: 1; white-space: nowrap;}
     .client_traffic_toggle{position: absolute; top: 50%; right: 4px; transform: translateY(-50%); display: inline-block; font-size: inherit; line-height: inherit; white-space: nowrap;}
